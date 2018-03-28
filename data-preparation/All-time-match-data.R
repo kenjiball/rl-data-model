@@ -2,8 +2,7 @@
 library(jsonlite)
 
 getwd()
-#setwd("C:/Users/kenji/Desktop/NRL/Fox_Sports_Data")
-setwd("C:/Users/ballk/Documents/Fox_Sports_Data/Fox_Sports_Data")
+setwd("")
 
 # Function to run season data into a single file
 create.statsmatrix <-function(match_vector){

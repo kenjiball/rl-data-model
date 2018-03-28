@@ -6,8 +6,8 @@ library(jsonlite)
 library(plyr)
 
 getwd()
-#setwd("C:/Users/kenji/Desktop/NRL/Fox_Sports_Data")
-setwd("C:/Users/ballk/Documents/Fox_Sports_Data/Fox_Sports_Data")
+
+# setwd("")
 
 
 # Load worksheet

@@ -4,6 +4,7 @@
 
 # This is the api to use for season data
 
+# Comment to test Github connection
 
 season_2010 <- paste("2010",
                      c(paste("01",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)

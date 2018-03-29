@@ -3,7 +3,6 @@
 # Adding a comment here to see how I can commit to Github
 
 # This is the api to use for season data
-https://statsapi.foxsports.com.au/3.0/api/sports/afl/series/1/currentseason.json?userkey=A00239D3-45F6-4A0A-810C-54A347F144C2%27
 
 
 season_2010 <- paste("2010",

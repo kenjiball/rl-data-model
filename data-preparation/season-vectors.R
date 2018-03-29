@@ -2,6 +2,10 @@
 # Create a vector of rounds for each season
 # Adding a comment here to see how I can commit to Github
 
+# This is the api to use for season data
+https://statsapi.foxsports.com.au/3.0/api/sports/afl/series/1/currentseason.json?userkey=A00239D3-45F6-4A0A-810C-54A347F144C2%27
+
+
 season_2010 <- paste("2010",
                      c(paste("01",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
                        ,paste("02",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)

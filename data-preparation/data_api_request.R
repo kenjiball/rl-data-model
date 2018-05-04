@@ -1,15 +1,15 @@
 # This is  first version attempt to scrape NRL data from Fox Sports
 # Using the fox sports stats API and Key
 
-# Import local variables from file
-
-getwd()
-setwd(wd)
-
-
 # Call packages
 library(curl)
 library(jsonlite)
+
+
+##### Import local variables from file #####
+
+setwd(wd)
+getwd()
 
 
 # Function to Read Player Data Json from API and save to file 

@@ -277,6 +277,18 @@ season_2017 <- paste("2017",
                      )
                      , sep = "", collapse = NULL)
 
+season_2018 <- paste("2018",
+                     c(paste("01",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       ,paste("02",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       ,paste("03",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       ,paste("04",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       ,paste("05",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       ,paste("06",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       ,paste("07",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       ,paste("08",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       )
+                     , sep = "", collapse = NULL)
+
 
 length(season_2010)
 length(season_2011)

@@ -1,12 +1,18 @@
 # Create a all time file which prepares data for the NRL ML Model
+
+# Call packages
 library(jsonlite)
 
+##### Import local variables from file #####
+
+# Set working directory
+setwd(wd)
 getwd()
-setwd("")
+
 
 # Function to run season data into a single file
 create.statsmatrix <-function(match_vector){
-  #match_vector <- season_2017
+  #match_vector <- season_2018
 # Set up an empty data frame     
   stats_df <- data.frame(match_id=character(),teamA_name=character(),teamA_errors=numeric(),teamA_inCompleteSets=numeric(),
                          teamA_kicks=numeric(),teamA_penaltiesAwarded=numeric(),teamA_points=numeric(),teamA_runs=numeric(),
@@ -64,6 +70,7 @@ teamA_stats <- jsonlite:::simplify(jsonMatchData$team_A$stats, flatten = TRUE)
 teamA_stats$momentum <- NULL
 teamA_stats$period <- NULL
 teamA_stats$completion_rate <- NULL
+teamA_stats$possession_time <- NULL
 teamA_stats_df <- as.data.frame(teamA_stats)
 name <- as.character(jsonMatchData$team_A$name)
 teamA_stats_df <- cbind(as.data.frame(name,stringsAsFactors=FALSE), as.data.frame(teamA_stats_df,stringsAsFactors=FALSE))
@@ -75,6 +82,7 @@ teamB_stats <- jsonlite:::simplify(jsonMatchData$team_B$stats, flatten = TRUE)
 teamB_stats$momentum <- NULL
 teamB_stats$period <- NULL
 teamB_stats$completion_rate <- NULL
+teamB_stats$possession_time <- NULL
 teamB_stats_df <- as.data.frame(teamB_stats)
 name <- as.character(jsonMatchData$team_B$name)
 teamB_stats_df <- cbind(as.data.frame(name,stringsAsFactors=FALSE), as.data.frame(teamB_stats_df,stringsAsFactors=FALSE))
@@ -229,7 +237,8 @@ stats_df <- rbind(stats_df,
 
 
 
-season_2017_datamatrix <- create.statsmatrix(season_2017)
+season_2018_datamatrix <- create.statsmatrix(season_2018)
+write.csv(season_2018_datamatrix,file="../season_2018_datamatrix.csv")
 
 
 
@@ -273,7 +282,6 @@ season_2017_datamatrix$for_name
 
 
 
-write.csv(season_2017_datamatrix,file="../season_2017_datamatrix3.csv")
 
 sapply(jsonMatchData$scoring_summary,class)
 stats_df

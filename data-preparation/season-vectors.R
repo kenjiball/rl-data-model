@@ -286,6 +286,7 @@ season_2018 <- paste("2018",
                        ,paste("06",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
                        ,paste("07",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
                        ,paste("08",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
+                       ,paste("09",c("01","02","03","04","05","06","07","08"), sep = "", collapse = NULL)
                        )
                      , sep = "", collapse = NULL)
 
@@ -298,3 +299,4 @@ length(season_2014)
 length(season_2015)
 length(season_2016)
 length(season_2017)
+length(season_2018)

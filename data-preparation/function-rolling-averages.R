@@ -5,15 +5,42 @@ library(zoo)
 
 # Must run function-season-data first to have season data matrix available or must be passed.
 
-for_name_test <- "Penrith"
+roll_mean_data <- function(data, team, window){
 
-season_2018_team <- subset(season_2018_datamatrix, for_name == for_name_test )
+    # team <- "Penrith"
+    # columns <- "[7:80,82:155]" 
+    # window <- 5
+  
+    season_2018_team <- subset(data, for_name == for_name_test )
+    
+    header_team <- season_2018_team[c(1:6,81)]
+    data_roll <- season_2018_team[c(7:80,82:155)] # season_2018_team[c(7:80,82:155)]
+    
+    rollmean_games <- rollapply(data_roll,window,mean, by.column = TRUE, partial = TRUE, align = "right")
+    
+    colnames(rollmean_games) <- paste(colnames(rollmean_games),"last3", sep = "_")
+    
+    cbind(header_team,rollmean_games)
+    
+    return(rollmean_games)
+
+}
+
+roll_mean_data(season_2018_datamatrix,"Penrith",3)
+
+
+class_list <- sapply(season_2018_team,class)
+
+# check if all columns in data_roll are numeric
+length(lapply(data_roll, is.numeric)) == sum(unlist(lapply(data_roll, is.numeric)))
 
 
 
-rollapply(season_2018_team[7:10],3,mean, by.column = TRUE, fill = NA)
 
-sapply(season_2018_team,class)
+# playing with correlation
+cor_test <- cor(data_roll)
+write.csv(cor_test, "../correlation_test.csv")
 
+plot(data)
 
 

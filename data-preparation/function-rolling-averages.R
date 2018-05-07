@@ -41,6 +41,6 @@ length(lapply(data_roll, is.numeric)) == sum(unlist(lapply(data_roll, is.numeric
 cor_test <- cor(data_roll)
 write.csv(cor_test, "../correlation_test.csv")
 
-plot(data)
+plot(season_2018_datamatrix$for_tries,season_2018_datamatrix$for_completion_rate)
 
 

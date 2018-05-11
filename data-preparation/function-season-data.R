@@ -133,18 +133,24 @@ teamA_average_kick_metres <- teamA_stats_df$teamA_kick_metres / teamA_stats_df$t
 teamA_average_run_metres <- teamA_stats_df$teamA_run_metres / teamA_stats_df$teamA_runs
 teamA_run_metres_success_rate <- teamA_stats_df$teamA_runs_8plus_meters / teamA_stats_df$teamA_runs
 teamA_penalty_ratio <- teamA_stats_df$teamA_penaltiesAwarded / (teamA_stats_df$teamA_penalties_conceded + teamA_stats_df$teamA_penaltiesAwarded)
+teamA_tackle_busts_per_run <- teamA_stats_df$teamA_tackle_busts / teamA_stats_df$teamA_runs
+teamA_gang_tackle_ratio <- teamB_stats_df$teamB_tackles / teamA_stats_df$teamA_runs
 
-teamA_additional_stats <- cbind(as.data.frame(teamA_tackle_success_rate, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_completion_rate, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_effective_offload_rate, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_oppHalf_tackle_percent, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_redzone_tackle_percent, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_redzone_conversion, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_linebreaK_try_ratio, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_average_kick_metres, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_average_run_metres, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_run_metres_success_rate, stringsAsFactors=FALSE),
-                    as.data.frame(teamA_penalty_ratio, stringsAsFactors=FALSE))
+
+
+teamA_additional_stats <- data.frame(teamA_tackle_success_rate,
+                                     teamA_completion_rate,
+                                     teamA_effective_offload_rate,
+                                     teamA_oppHalf_tackle_percent,
+                                     teamA_redzone_tackle_percent,
+                                     teamA_redzone_conversion,
+                                     teamA_linebreaK_try_ratio,
+                                     teamA_average_kick_metres,
+                                     teamA_average_run_metres,
+                                     teamA_run_metres_success_rate,
+                                     teamA_penalty_ratio,
+                                     teamA_tackle_busts_per_run,
+                                     teamA_gang_tackle_ratio)
 
 teamB_tackle_success_rate <- as.numeric(1 - teamB_stats_df$teamB_missed_tackles / teamB_stats_df$teamB_tackles)
 teamB_completion_rate <- as.numeric(teamB_stats_df$teamB_complete_sets / teamB_stats_df$teamB_total_sets)
@@ -157,21 +163,22 @@ teamB_average_kick_metres <- teamB_stats_df$teamB_kick_metres / teamB_stats_df$t
 teamB_average_run_metres <- teamB_stats_df$teamB_run_metres / teamB_stats_df$teamB_runs
 teamB_run_metres_success_rate <- teamB_stats_df$teamB_runs_8plus_meters / teamB_stats_df$teamB_runs
 teamB_penalty_ratio <- teamB_stats_df$teamB_penaltiesAwarded / (teamB_stats_df$teamB_penalties_conceded + teamB_stats_df$teamB_penaltiesAwarded)
+teamB_tackle_busts_per_run <- teamB_stats_df$teamB_tackle_busts / teamB_stats_df$teamB_runs
+teamB_gang_tackle_ratio <- teamA_stats_df$teamA_tackles / teamB_stats_df$teamB_runs
 
-teamB_additional_stats <- cbind(as.data.frame(teamB_tackle_success_rate, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_completion_rate, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_effective_offload_rate, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_oppHalf_tackle_percent, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_redzone_tackle_percent, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_redzone_conversion, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_linebreaK_try_ratio, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_average_kick_metres, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_average_run_metres, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_run_metres_success_rate, stringsAsFactors=FALSE),
-                    as.data.frame(teamB_penalty_ratio, stringsAsFactors=FALSE))
-
-
-
+teamB_additional_stats <- data.frame(teamB_tackle_success_rate,
+                                     teamB_completion_rate,
+                                     teamB_effective_offload_rate,
+                                     teamB_oppHalf_tackle_percent,
+                                     teamB_redzone_tackle_percent,
+                                     teamB_redzone_conversion,
+                                     teamB_linebreaK_try_ratio,
+                                     teamB_average_kick_metres,
+                                     teamB_average_run_metres,
+                                     teamB_run_metres_success_rate,
+                                     teamB_penalty_ratio,
+                                     teamB_tackle_busts_per_run,
+                                     teamB_gang_tackle_ratio)
 
 # set up array for both team for and against
 for_stats_df_A <- teamA_stats_df

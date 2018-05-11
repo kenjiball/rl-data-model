@@ -38,11 +38,25 @@ length(lapply(data_roll, is.numeric)) == sum(unlist(lapply(data_roll, is.numeric
 
 
 # playing with correlation
-cor_data <- season_2018_datamatrix[c(7:80,82:155)]
+
+
+cor_data <- season_2018_datamatrix[c(7:83,85:161)]
 
 cor_test <- cor(cor_data)
 write.csv(cor_test, "../correlation_test.csv")
 
-plot(season_2018_datamatrix$for_tries,season_2018_datamatrix$for_completion_rate)
+# Testing to see the structure of sets
+sets <- data.frame(season_2018_datamatrix$for_complete_sets, season_2018_datamatrix$for_inCompleteSets
+          , season_2018_datamatrix$for_total_sets, season_2018_datamatrix$for_penaltiesAwarded
+          , season_2018_datamatrix$for_errors, season_2018_datamatrix$for_tries
+          , season_2018_datamatrix$for_goal_attempted, season_2018_datamatrix$for_kicks)
+names(sets) <- c("for_complete_sets","for_inCompleteSets","for_total_sets","for_penaltiesAwarded"
+                 ,"for_errors","for_tries","for_goal_attempted","for_kicks")
+
+head(sets,10)
+
+
+
+
 
 

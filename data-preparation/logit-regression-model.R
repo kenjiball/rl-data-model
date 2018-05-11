@@ -7,6 +7,7 @@
 
 library(Amelia)
 library(rminer)
+library(pscl)
 
 # define the data set to be used
 nrl_data <- season_2018_datamatrix
@@ -48,10 +49,10 @@ choose.columns <- c("for_match_result",
                     "for_redzone_tackle_percent",
                     "for_run_metres",
                     "for_tackle_busts_per_run")
-                    
 
-#c(7:83,85:161)
 nrl_tr_trim <- nrl_tr[choose.columns]
+nrl_ts_trim <- nrl_ts[choose.columns]
+
 contrasts(nrl_tr_trim$for_match_result)
 
 model <- glm(for_match_result ~.,family=binomial(link='logit'),data=nrl_tr_trim)
@@ -59,13 +60,25 @@ model <- glm(for_match_result ~.,family=binomial(link='logit'),data=nrl_tr_trim)
 # See summary of model to determine Deterministic (significant) Variables
 # Remember that in the logit model the response variable is log odds: 
 # ln(odds) = ln(p/(1-p)) = a*x1 + b*x2 + … + z*xn
+# McFadden R2 index can be used to assess the model fit
+# McFadden's pseudo R-squared ranging from 0.2 to 0.4 indicates very good model fit
 
 summary(model)
+anova(model, test="Chisq")
+pR2(model)
 
+# Test the accuracy of the model using the test hold out cell
 
+fitted.results <- predict(model,nrl_ts_trim,type='response')
+fitted.results2 <- ifelse(fitted.results > 0.5,"Lose","Win")
+misClasificError <- mean(fitted.results2 != nrl_ts_trim$for_match_result)
+print(paste('Accuracy',1-misClasificError))
 
+see_results <- data.frame(nrl_ts$for_name, nrl_ts$against_name,
+                          nrl_ts$for_points, nrl_ts$against_points,
+                          fitted.results, fitted.results2, nrl_ts_trim)
 
-
+write.csv(see_results,file="../model_test_results.csv")
 
 
 dim(nrl_data)

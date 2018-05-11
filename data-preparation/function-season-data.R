@@ -183,7 +183,7 @@ names(for_sc_df_A) <- gsub("teamA", "for", names(for_sc_df_A), fixed=TRUE)
 against_stats_df_A <- teamB_stats_df
 names(against_stats_df_A) <- gsub("teamB", "against", names(against_stats_df_A), fixed=TRUE)
 against_additional_stats_A <- teamB_additional_stats
-names(against_additional_stats_A) <- gsub("teamB", "for", names(against_additional_stats_A), fixed=TRUE)
+names(against_additional_stats_A) <- gsub("teamB", "against", names(against_additional_stats_A), fixed=TRUE)
 against_sc_df_A <- teamB_sc
 names(against_sc_df_A) <- gsub("teamB", "against", names(against_sc_df_A), fixed=TRUE)
 
@@ -199,7 +199,7 @@ names(for_sc_df_B) <- gsub("teamB", "for", names(for_sc_df_B), fixed=TRUE)
 against_stats_df_B <- teamA_stats_df
 names(against_stats_df_B) <- gsub("teamA", "against", names(against_stats_df_B), fixed=TRUE)
 against_additional_stats_B <- teamA_additional_stats
-names(against_additional_stats_B) <- gsub("teamA", "for", names(against_additional_stats_B), fixed=TRUE)
+names(against_additional_stats_B) <- gsub("teamA", "against", names(against_additional_stats_B), fixed=TRUE)
 against_sc_df_B <- teamA_sc
 names(against_sc_df_B) <- gsub("teamA", "against", names(against_sc_df_B), fixed=TRUE)
 

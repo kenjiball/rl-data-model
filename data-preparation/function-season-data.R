@@ -135,8 +135,9 @@ teamA_run_metres_success_rate <- teamA_stats_df$teamA_runs_8plus_meters / teamA_
 teamA_penalty_ratio <- teamA_stats_df$teamA_penaltiesAwarded / (teamA_stats_df$teamA_penalties_conceded + teamA_stats_df$teamA_penaltiesAwarded)
 teamA_tackle_busts_per_run <- teamA_stats_df$teamA_tackle_busts / teamA_stats_df$teamA_runs
 teamA_gang_tackle_ratio <- teamB_stats_df$teamB_tackles / teamA_stats_df$teamA_runs
-
-
+teamA_match_result <- ifelse(teamA_stats_df$teamA_points > teamB_stats_df$teamB_points, "Win",
+             ifelse(teamA_stats_df$teamA_points < teamB_stats_df$teamB_points, "Lose",
+             ifelse(teamA_stats_df$teamA_points < teamB_stats_df$teamB_points,"Draw",NA)))
 
 teamA_additional_stats <- data.frame(teamA_tackle_success_rate,
                                      teamA_completion_rate,
@@ -150,7 +151,8 @@ teamA_additional_stats <- data.frame(teamA_tackle_success_rate,
                                      teamA_run_metres_success_rate,
                                      teamA_penalty_ratio,
                                      teamA_tackle_busts_per_run,
-                                     teamA_gang_tackle_ratio)
+                                     teamA_gang_tackle_ratio,
+                                     teamA_match_result)
 
 teamB_tackle_success_rate <- as.numeric(1 - teamB_stats_df$teamB_missed_tackles / teamB_stats_df$teamB_tackles)
 teamB_completion_rate <- as.numeric(teamB_stats_df$teamB_complete_sets / teamB_stats_df$teamB_total_sets)
@@ -165,6 +167,9 @@ teamB_run_metres_success_rate <- teamB_stats_df$teamB_runs_8plus_meters / teamB_
 teamB_penalty_ratio <- teamB_stats_df$teamB_penaltiesAwarded / (teamB_stats_df$teamB_penalties_conceded + teamB_stats_df$teamB_penaltiesAwarded)
 teamB_tackle_busts_per_run <- teamB_stats_df$teamB_tackle_busts / teamB_stats_df$teamB_runs
 teamB_gang_tackle_ratio <- teamA_stats_df$teamA_tackles / teamB_stats_df$teamB_runs
+teamB_match_result <- ifelse(teamB_stats_df$teamB_points > teamA_stats_df$teamA_points, "Win",
+             ifelse(teamB_stats_df$teamB_points < teamA_stats_df$teamA_points, "Lose",
+             ifelse(teamB_stats_df$teamB_points < teamA_stats_df$teamA_points,"Draw",NA)))
 
 teamB_additional_stats <- data.frame(teamB_tackle_success_rate,
                                      teamB_completion_rate,
@@ -178,7 +183,8 @@ teamB_additional_stats <- data.frame(teamB_tackle_success_rate,
                                      teamB_run_metres_success_rate,
                                      teamB_penalty_ratio,
                                      teamB_tackle_busts_per_run,
-                                     teamB_gang_tackle_ratio)
+                                     teamB_gang_tackle_ratio,
+                                     teamB_match_result)
 
 # set up array for both team for and against
 for_stats_df_A <- teamA_stats_df
@@ -247,12 +253,7 @@ stats_df <- rbind(stats_df,
 season_2018_datamatrix <- create.statsmatrix(season_2018)
 write.csv(season_2018_datamatrix,file="../season_2018_datamatrix.csv")
 
-
-
-season_2017_datamatrix$for_tackles_avg_last3 <- sapply(1:nrow(season_2017_datamatrix), FUN = last3)
-
-
-season_2017_datamatrix$for_name
+names(season_2018_datamatrix)
 
 
 

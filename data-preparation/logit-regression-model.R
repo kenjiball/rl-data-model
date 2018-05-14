@@ -9,6 +9,7 @@ library(Amelia)
 library(rminer)
 library(pscl)
 library(neuralnet)
+library(caret)
 
 # define the data set to be used
 nrl_data <- season_2018_datamatrix
@@ -150,6 +151,10 @@ MSE
 plot_data <- data.frame(as.data.frame(predict_games_result),as.data.frame(actual_games_result))
 names(plot_data) <- c("prediction","actual")
 plot(plot_data$prediction, plot_data$actual)
+
+
+test1 <- ifelse(plot_data$prediction > 0.5, 1, 0)
+confusionMatrix(as.factor(test1), as.factor(plot_data$actual))
 
 
 dim(nrl_data)

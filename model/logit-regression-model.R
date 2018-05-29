@@ -97,61 +97,6 @@ see_results <- data.frame(nrl_test$for_name, nrl_test$against_name,
 
 write.csv(see_results,file="../model_test_results.csv")
 
-# Run Neural Network Model
-
-# Replace Win/Loss in for_match_result
-nrl_train_trim_s <- nrl_train_trim
-nrl_train_trim_s$for_match_result <- sapply(nrl_train_trim_s$for_match_result,function(x) {x <- gsub("Win",1,x)})
-nrl_train_trim_s$for_match_result <- sapply(nrl_train_trim_s$for_match_result,function(x) {x <- gsub("Lose",0,x)})
-nrl_train_trim_s$for_match_result <- as.numeric(nrl_train_trim_s$for_match_result)
-
-nrl_test_trim_s <- nrl_test_trim
-nrl_test_trim_s$for_match_result <- sapply(nrl_test_trim_s$for_match_result,function(x) {x <- gsub("Win",1,x)})
-nrl_test_trim_s$for_match_result <- sapply(nrl_test_trim_s$for_match_result,function(x) {x <- gsub("Lose",0,x)})
-nrl_test_trim_s$for_match_result <- as.numeric(nrl_test_trim_s$for_match_result)
-
-
-# Normalise data so each variable is scaled from 0 to 1
-max_value <- as.numeric(sapply(nrl_train_trim_s, max))
-min_value <- as.numeric(sapply(nrl_train_trim_s, min))
-scale_value <- max_value - min_value
-nrl_train_trim_norm <- as.data.frame(scale(nrl_train_trim_s, center = min_value, scale = scale_value))
-
-max_value <- as.numeric(sapply(nrl_test_trim_s, max))
-min_value <- as.numeric(sapply(nrl_test_trim_s, min))
-scale_value <- max_value - min_value
-nrl_test_trim_norm <- as.data.frame(scale(nrl_test_trim_s, center = min_value, scale = scale_value))
-
-
-head(nrl_train_trim_norm)
-
-# Set up the formula to define the prediction and the input variables.
-
-all_vars <- colnames(nrl_train_trim_norm)
-predictor_var <- "for_match_result"
-input_vars <- paste(all_vars[!all_vars%in%predictor_var], collapse = "+")
-formula_vars <-  as.formula(paste(paste(predictor_var,"~"),input_vars, collapse = "+"))
-
-
-# Create Neural Network Model
-neural_model <- neuralnet(formula = formula_vars, hidden = 4, linear.output = T, data = nrl_train_trim_norm)
-
-plot(neural_model)
-
-# Predit result using neural network and test data
-predict_games <- compute(neural_model, nrl_test_trim_norm[,2:20])
-
-# Measure the accuracy of the Predictions
-predict_games_result <- predict_games$net.result*(max(nrl_test_trim_norm$for_match_result)-min(nrl_test_trim_norm$for_match_result))+min(nrl_test_trim_norm$for_match_result)
-actual_games_result <- nrl_test_trim_norm$for_match_result * (max(nrl_test_trim_norm$for_match_result)-min(nrl_test_trim_norm$for_match_result))+min(nrl_test_trim_norm$for_match_result)
-
-MSE <- sum((predict_games_result - actual_games_result)^2)/nrow(nrl_test_trim_norm)
-MSE
-
-plot_data <- data.frame(as.data.frame(predict_games_result),as.data.frame(actual_games_result))
-names(plot_data) <- c("prediction","actual")
-plot(plot_data$prediction, plot_data$actual)
-
 
 test1 <- ifelse(plot_data$prediction > 0.5, 1, 0)
 confusionMatrix(as.factor(test1), as.factor(plot_data$actual))

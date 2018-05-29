@@ -30,7 +30,13 @@ roll_mean_data <- function(data, team, window, app_name,header){
 
 }
 
-roll1_data <- roll_mean_data(season_2018_datamatrix,"Penrith",list(-1:-1),"last1",TRUE)
+# Roll over all team
+team_names <- levels(as.factor(season_2018_datamatrix$for_name))
+
+# for loop through the list of team names
+
+# Roll over a single team
+roll1_data <- roll_mean_data(season_2018_datamatrix,"Penrith",list(-1:-1),"last1",FALSE)
 roll3_data <- roll_mean_data(season_2018_datamatrix,"Penrith",list(-1:-3),"last3",FALSE)
 roll5_data <- roll_mean_data(season_2018_datamatrix,"Penrith",list(-1:-5),"last5",FALSE)
 rollseason_data <- roll_mean_data(season_2018_datamatrix,"Penrith",list(-1:-30),"seasonavg",FALSE)

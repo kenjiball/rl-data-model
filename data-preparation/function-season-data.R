@@ -14,40 +14,168 @@ getwd()
 create.statsmatrix <-function(match_vector){
   #match_vector <- season_2018
 # Set up an empty data frame     
-  stats_df <- data.frame(match_id=character(),teamA_name=character(),teamA_errors=numeric(),teamA_inCompleteSets=numeric(),
-                         teamA_kicks=numeric(),teamA_penaltiesAwarded=numeric(),teamA_points=numeric(),teamA_runs=numeric(),
-                         teamA_tackledOpp20=numeric(),teamA_tackles=numeric(),teamA_territory=numeric(),teamA_tries=numeric(),
-                         teamA_attacking_kicks=numeric(),teamA_complete_sets=numeric(),teamA_drop_outs=numeric(),teamA_dummy_half_runs=numeric(),
-                         teamA_effective_offloads=numeric(),teamA_field_goal_attempts=numeric(),teamA_field_goal_misses=numeric(),
-                         teamA_field_goals=numeric(),teamA_forced_drop_outs=numeric(),teamA_general_play_pass=numeric(),
-                         teamA_goal_percentage=numeric(),teamA_in_goal_escapes=numeric(),teamA_interchanges_off=numeric(),
-                         teamA_interchanges_on=numeric(),teamA_kick_metres=numeric(),teamA_kicks_4020=numeric(),teamA_kicks_dead=numeric(),
-                         teamA_last_touch_try_assists=numeric(),teamA_line_break_assists=numeric(),teamA_line_break_causes=numeric(),
-                         teamA_line_breaks=numeric(),teamA_line_engagements=numeric(),teamA_long_kicks=numeric(),teamA_missed_tackles=numeric(),
-                         teamA_off_loads=numeric(),teamA_one_pass_runs=numeric(),teamA_penalties_conceded=numeric(),teamA_play_the_balls=numeric(),
-                         teamA_possession_last10=numeric(),teamA_possession_percentage=numeric(),teamA_run_metres=numeric(),teamA_runs_7less_meters=numeric(),
-                         teamA_runs_8plus_meters=numeric(),teamA_send_offs=numeric(),teamA_sin_bins=numeric(),teamA_tackle_busts=numeric(),
-                         teamA_tackle_opp_half=numeric(),teamA_tackles_one_on_one=numeric(),teamA_total_sets=numeric(),teamA_try_assists=numeric(),
-                         teamA_try_causes=numeric(),teamA_try_contributions=numeric(),teamA_try_involvements=numeric(),teamA_twenty_metre_restarts=numeric(),
-                         teamA_weighted_kicks=numeric(),teamA_win_prediction_percentage=numeric(),teamA_goal_made=numeric(),teamA_goal_missed=numeric(),
-                         teamA_Possession_Last_5_Minutes=numeric(),teamA_Time_in_Opposition_Half=numeric(),teamA_Tackled_in_Opposition_20m=numeric(),
-                         teamA_Play_the_balls=numeric(),teamB_name=character(),teamB_errors=numeric(),teamB_inCompleteSets=numeric(),teamB_kicks=numeric(),
-                         teamB_penaltiesAwarded=numeric(),teamB_points=numeric(),teamB_runs=numeric(),teamB_tackledOpp20=numeric(),
-                         teamB_tackles=numeric(),teamB_territory=numeric(),teamB_tries=numeric(),teamB_attacking_kicks=numeric(),teamB_complete_sets=numeric(),
-                         teamB_drop_outs=numeric(),teamB_dummy_half_runs=numeric(),teamB_effective_offloads=numeric(),teamB_field_goal_attempts=numeric(),
-                         teamB_field_goal_misses=numeric(),teamB_field_goals=numeric(),teamB_forced_drop_outs=numeric(),teamB_general_play_pass=numeric(),
-                         teamB_goal_percentage=numeric(),teamB_in_goal_escapes=numeric(),teamB_interchanges_off=numeric(),teamB_interchanges_on=numeric(),
-                         teamB_kick_metres=numeric(),teamB_kicks_4020=numeric(),teamB_kicks_dead=numeric(),teamB_last_touch_try_assists=numeric(),
-                         teamB_line_break_assists=numeric(),teamB_line_break_causes=numeric(),teamB_line_breaks=numeric(),teamB_line_engagements=numeric(),
-                         teamB_long_kicks=numeric(),teamB_missed_tackles=numeric(),teamB_off_loads=numeric(),teamB_one_pass_runs=numeric(),
-                         teamB_penalties_conceded=numeric(),teamB_play_the_balls=numeric(),teamB_possession_last10=numeric(),teamB_possession_percentage=numeric(),
-                         teamB_run_metres=numeric(),teamB_runs_7less_meters=numeric(),teamB_runs_8plus_meters=numeric(),teamB_send_offs=numeric(),
-                         teamB_sin_bins=numeric(),teamB_tackle_busts=numeric(),teamB_tackle_opp_half=numeric(),teamB_tackles_one_on_one=numeric(),
-                         teamB_total_sets=numeric(),teamB_try_assists=numeric(),teamB_try_causes=numeric(),teamB_try_contributions=numeric(),
-                         teamB_try_involvements=numeric(),teamB_twenty_metre_restarts=numeric(),teamB_weighted_kicks=numeric(),
-                         teamB_win_prediction_percentage=numeric(),teamB_goal_made=numeric(),teamB_goal_missed=numeric(),teamB_Possession_Last_5_Minutes=numeric(),
-                         teamB_Time_in_Opposition_Half=numeric(),teamB_Tackled_in_Opposition_20m=numeric(),teamB_Play_the_balls=numeric(),
-                         stringsAsFactors=FALSE)
+  stats_df <- data.frame(
+    match_id=character(),
+    season=numeric(),
+    round=numeric(),
+    match=numeric(),
+    Home_Away=character(),
+    for_name=character(),
+    for_errors=numeric(),
+    for_inCompleteSets=numeric(),
+    for_kicks=numeric(),
+    for_penaltiesAwarded=numeric(),
+    for_points=numeric(),
+    for_runs=numeric(),
+    for_tackledOpp20=numeric(),
+    for_tackles=numeric(),
+    for_territory=numeric(),
+    for_tries=numeric(),
+    for_attacking_kicks=numeric(),
+    for_complete_sets=numeric(),
+    for_drop_outs=numeric(),
+    for_dummy_half_runs=numeric(),
+    for_effective_offloads=numeric(),
+    for_field_goal_attempts=numeric(),
+    for_field_goal_misses=numeric(),
+    for_field_goals=numeric(),
+    for_forced_drop_outs=numeric(),
+    for_general_play_pass=numeric(),
+    for_goal_percentage=numeric(),
+    for_in_goal_escapes=numeric(),
+    for_interchanges_off=numeric(),
+    for_interchanges_on=numeric(),
+    for_kick_metres=numeric(),
+    for_kicks_4020=numeric(),
+    for_kicks_dead=numeric(),
+    for_last_touch_try_assists=numeric(),
+    for_line_break_assists=numeric(),
+    for_line_break_causes=numeric(),
+    for_line_breaks=numeric(),
+    for_line_engagements=numeric(),
+    for_long_kicks=numeric(),
+    for_missed_tackles=numeric(),
+    for_off_loads=numeric(),
+    for_one_pass_runs=numeric(),
+    for_penalties_conceded=numeric(),
+    for_play_the_balls=numeric(),
+    for_possession_last10=numeric(),
+    for_possession_percentage=numeric(),
+    for_run_metres=numeric(),
+    for_runs_7less_meters=numeric(),
+    for_runs_8plus_meters=numeric(),
+    for_send_offs=numeric(),
+    for_sin_bins=numeric(),
+    for_tackle_busts=numeric(),
+    for_tackle_opp_half=numeric(),
+    for_tackles_one_on_one=numeric(),
+    for_total_sets=numeric(),
+    for_try_assists=numeric(),
+    for_try_causes=numeric(),
+    for_try_contributions=numeric(),
+    for_try_involvements=numeric(),
+    for_twenty_metre_restarts=numeric(),
+    for_weighted_kicks=numeric(),
+    for_win_prediction_percentage=numeric(),
+    for_goal_made=numeric(),
+    for_goal_attempted=numeric(),
+    for_tackle_success_rate=numeric(),
+    for_completion_rate=numeric(),
+    for_effective_offload_rate=numeric(),
+    for_oppHalf_tackle_percent=numeric(),
+    for_redzone_tackle_percent=numeric(),
+    for_redzone_conversion=numeric(),
+    for_linebreaK_try_ratio=numeric(),
+    for_average_kick_metres=numeric(),
+    for_average_run_metres=numeric(),
+    for_run_metres_success_rate=numeric(),
+    for_penalty_ratio=numeric(),
+    for_tackle_busts_per_run=numeric(),
+    for_gang_tackle_ratio=numeric(),
+    for_match_result=character(),
+    for_Possession_Last_5_Minutes=numeric(),
+    for_Time_in_Opposition_Half=numeric(),
+    for_Tackled_in_Opposition_20m=numeric(),
+    for_Play_the_balls=numeric(),
+    against_name=character(),
+    against_errors=numeric(),
+    against_inCompleteSets=numeric(),
+    against_kicks=numeric(),
+    against_penaltiesAwarded=numeric(),
+    against_points=numeric(),
+    against_runs=numeric(),
+    against_tackledOpp20=numeric(),
+    against_tackles=numeric(),
+    against_territory=numeric(),
+    against_tries=numeric(),
+    against_attacking_kicks=numeric(),
+    against_complete_sets=numeric(),
+    against_drop_outs=numeric(),
+    against_dummy_half_runs=numeric(),
+    against_effective_offloads=numeric(),
+    against_field_goal_attempts=numeric(),
+    against_field_goal_misses=numeric(),
+    against_field_goals=numeric(),
+    against_forced_drop_outs=numeric(),
+    against_general_play_pass=numeric(),
+    against_goal_percentage=numeric(),
+    against_in_goal_escapes=numeric(),
+    against_interchanges_off=numeric(),
+    against_interchanges_on=numeric(),
+    against_kick_metres=numeric(),
+    against_kicks_4020=numeric(),
+    against_kicks_dead=numeric(),
+    against_last_touch_try_assists=numeric(),
+    against_line_break_assists=numeric(),
+    against_line_break_causes=numeric(),
+    against_line_breaks=numeric(),
+    against_line_engagements=numeric(),
+    against_long_kicks=numeric(),
+    against_missed_tackles=numeric(),
+    against_off_loads=numeric(),
+    against_one_pass_runs=numeric(),
+    against_penalties_conceded=numeric(),
+    against_play_the_balls=numeric(),
+    against_possession_last10=numeric(),
+    against_possession_percentage=numeric(),
+    against_run_metres=numeric(),
+    against_runs_7less_meters=numeric(),
+    against_runs_8plus_meters=numeric(),
+    against_send_offs=numeric(),
+    against_sin_bins=numeric(),
+    against_tackle_busts=numeric(),
+    against_tackle_opp_half=numeric(),
+    against_tackles_one_on_one=numeric(),
+    against_total_sets=numeric(),
+    against_try_assists=numeric(),
+    against_try_causes=numeric(),
+    against_try_contributions=numeric(),
+    against_try_involvements=numeric(),
+    against_twenty_metre_restarts=numeric(),
+    against_weighted_kicks=numeric(),
+    against_win_prediction_percentage=numeric(),
+    against_goal_made=numeric(),
+    against_goal_attempted=numeric(),
+    against_tackle_success_rate=numeric(),
+    against_completion_rate=numeric(),
+    against_effective_offload_rate=numeric(),
+    against_oppHalf_tackle_percent=numeric(),
+    against_redzone_tackle_percent=numeric(),
+    against_redzone_conversion=numeric(),
+    against_linebreaK_try_ratio=numeric(),
+    against_average_kick_metres=numeric(),
+    against_average_run_metres=numeric(),
+    against_run_metres_success_rate=numeric(),
+    against_penalty_ratio=numeric(),
+    against_tackle_busts_per_run=numeric(),
+    against_gang_tackle_ratio=numeric(),
+    against_match_result=character(),
+    against_Possession_Last_5_Minutes=numeric(),
+    against_Time_in_Opposition_Half=numeric(),
+    against_Tackled_in_Opposition_20m=numeric(),
+    against_Play_the_balls=numeric(),
+    stringsAsFactors=FALSE)
+  
   
 for(i in 1:length(match_vector)){  
   #i <- 1    
@@ -71,6 +199,7 @@ teamA_stats$momentum <- NULL
 teamA_stats$period <- NULL
 teamA_stats$completion_rate <- NULL
 teamA_stats$possession_time <- NULL
+teamA_stats$territory_time <- NULL
 teamA_stats_df <- as.data.frame(teamA_stats)
 name <- as.character(jsonMatchData$team_A$name)
 teamA_stats_df <- cbind(as.data.frame(name,stringsAsFactors=FALSE), as.data.frame(teamA_stats_df,stringsAsFactors=FALSE))
@@ -83,6 +212,7 @@ teamB_stats$momentum <- NULL
 teamB_stats$period <- NULL
 teamB_stats$completion_rate <- NULL
 teamB_stats$possession_time <- NULL
+teamB_stats$territory_time <- NULL
 teamB_stats_df <- as.data.frame(teamB_stats)
 name <- as.character(jsonMatchData$team_B$name)
 teamB_stats_df <- cbind(as.data.frame(name,stringsAsFactors=FALSE), as.data.frame(teamB_stats_df,stringsAsFactors=FALSE))
@@ -256,6 +386,39 @@ write.csv(season_2018_datamatrix,file="../season_2018_datamatrix.csv")
 names(season_2018_datamatrix)
 
 
+season_2010_datamatrix <- create.statsmatrix(season_2010)
+season_2011_datamatrix <- create.statsmatrix(season_2011)
+season_2012_datamatrix <- create.statsmatrix(season_2012)
+season_2013_datamatrix <- create.statsmatrix(season_2013)
+season_2014_datamatrix <- create.statsmatrix(season_2014)
+season_2015_datamatrix <- create.statsmatrix(season_2015)
+season_2016_datamatrix <- create.statsmatrix(season_2016)
+season_2017_datamatrix <- create.statsmatrix(season_2017)
+season_2018_datamatrix <- create.statsmatrix(season_2018)
+
+dim(season_2010_datamatrix)
+dim(season_2011_datamatrix)
+dim(season_2012_datamatrix) 
+dim(season_2013_datamatrix) 
+dim(season_2014_datamatrix) 
+dim(season_2015_datamatrix) 
+dim(season_2016_datamatrix) 
+dim(season_2017_datamatrix) 
+dim(season_2018_datamatrix)
+
+season_all_datamatrix <- rbind(season_2011_datamatrix
+                                    ,season_2012_datamatrix
+                                    ,season_2013_datamatrix
+                                    ,season_2014_datamatrix
+                                    ,season_2015_datamatrix
+                                    ,season_2016_datamatrix
+                                    ,season_2017_datamatrix
+                                    ,season_2018_datamatrix
+                                    
+                                    )
+
+
+write.csv(season_all_datamatrix,file="../season_all_datamatrix.csv")
 
 
 

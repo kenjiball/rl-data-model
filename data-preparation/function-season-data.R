@@ -380,12 +380,6 @@ stats_df <- rbind(stats_df,
 
 
 
-season_2018_datamatrix <- create.statsmatrix(season_2018)
-write.csv(season_2018_datamatrix,file="../season_2018_datamatrix.csv")
-
-names(season_2018_datamatrix)
-
-
 season_2010_datamatrix <- create.statsmatrix(season_2010)
 season_2011_datamatrix <- create.statsmatrix(season_2011)
 season_2012_datamatrix <- create.statsmatrix(season_2012)

@@ -1,5 +1,4 @@
-# This is  first version attempt to scrape NRL data from Fox Sports
-# Using the fox sports stats API and Key
+# Get data using the Stats API and Key
 
 # Call packages
 library(curl)

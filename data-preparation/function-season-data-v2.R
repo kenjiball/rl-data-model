@@ -116,7 +116,7 @@ create.statsmatrix <-function(match_vector){
            ,teamA_oppHalf_tackle_percent = teamA_stats_df$teamA_tackle_opp_half / teamA_stats_df$teamA_play_the_balls
            ,teamA_redzone_tackle_percent = teamA_stats_df$teamA_tackledOpp20 / teamA_stats_df$teamA_play_the_balls
            ,teamA_redzone_conversion = teamA_stats_df$teamA_tries / teamA_stats_df$teamA_tackledOpp20
-           ,teamA_linebreaK_try_ratio = teamA_stats_df$teamA_tries / teamA_stats_df$teamA_line_breaks
+           ,teamA_linebreak_try_ratio = teamA_stats_df$teamA_tries / teamA_stats_df$teamA_line_breaks
            ,teamA_average_kick_metres = teamA_stats_df$teamA_kick_metres / teamA_stats_df$teamA_kicks
            ,teamA_average_run_metres = teamA_stats_df$teamA_run_metres / teamA_stats_df$teamA_runs
            ,teamA_run_metres_success_rate = teamA_stats_df$teamA_runs_8plus_meters / teamA_stats_df$teamA_runs
@@ -135,7 +135,7 @@ create.statsmatrix <-function(match_vector){
            ,teamB_oppHalf_tackle_percent = teamB_stats_df$teamB_tackle_opp_half / teamB_stats_df$teamB_play_the_balls
            ,teamB_redzone_tackle_percent = teamB_stats_df$teamB_tackledOpp20 / teamB_stats_df$teamB_play_the_balls
            ,teamB_redzone_conversion = teamB_stats_df$teamB_tries / teamB_stats_df$teamB_tackledOpp20
-           ,teamB_linebreaK_try_ratio = teamB_stats_df$teamB_tries / teamB_stats_df$teamB_line_breaks
+           ,teamB_linebreak_try_ratio = teamB_stats_df$teamB_tries / teamB_stats_df$teamB_line_breaks
            ,teamB_average_kick_metres = teamB_stats_df$teamB_kick_metres / teamB_stats_df$teamB_kicks
            ,teamB_average_run_metres = teamB_stats_df$teamB_run_metres / teamB_stats_df$teamB_runs
            ,teamB_run_metres_success_rate = teamB_stats_df$teamB_runs_8plus_meters / teamB_stats_df$teamB_runs

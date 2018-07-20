@@ -14,10 +14,10 @@ getwd()
 
 # Function to run season data into a single file
 create.statsmatrix <-function(match_vector){
-  #match_vector <- season_2018
+   #match_vector <- season_2018
   
   for(i in 1:length(match_vector)){  
-  #i <- 1    
+  #i <- 2
 
   # Load a json file for a single game and build to data frame
   jsonFileName <- match_vector[i]
@@ -29,10 +29,12 @@ create.statsmatrix <-function(match_vector){
   match_id <- data.frame(jsonMatchData$match_id)
   names(match_id) <- c("match_id") 
   
-  match_info <- match_id %>% mutate(season = substr(match_id, 4, 7),
-                    round = substr(match_id, 8, 9),
-                    match = substr(match_id, 10, 11)
-                    )   
+  match_info <- match_id %>% 
+                    mutate(season = substr(match_id, 4, 7),
+                          round = substr(match_id, 8, 9),
+                          match = substr(match_id, 10, 11)
+                          ) 
+  match_info <- match_info %>% mutate_if(sapply(match_info,is.factor), as.character)
     
   ##### Get stats for Team A
   teamA_stats <- jsonlite:::simplify(jsonMatchData$team_A$stats, flatten = TRUE)
@@ -220,6 +222,14 @@ dim(season_2018_datamatrix)
 write.csv(season_2018_datamatrix,file="../season_2018_datamatrix_new.csv")
 
 
+# check class
+sapply(season_2018_datamatrix,class)
+sapply(season_2018_datamatrix_old,class)
+
+class(season_2018_datamatrix$for_match_result)
+class(season_2018_datamatrix_old$for_match_result)
+
+
 
 # To check that data is all equal to previous function
 season_2018_datamatrix$against_territory_time<- NULL
@@ -230,7 +240,9 @@ dim(season_2018_datamatrix)
 head(season_2018_datamatrix)
 
 # If this check is true then correctly built
+
 all_equal(season_2018_datamatrix_old,season_2018_datamatrix, convert = TRUE, ignore_col_order = TRUE)
+
 
 
 

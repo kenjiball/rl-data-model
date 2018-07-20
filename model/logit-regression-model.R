@@ -10,6 +10,8 @@ library(rminer)
 library(pscl)
 library(neuralnet)
 library(caret)
+library(dplyr)
+library(pROC)
 
 # define the data set to be used
 nrl_data <- season_2018_datamatrix
@@ -27,52 +29,60 @@ nrl_train_ind <- floor(length(round_factors)*ratio)
 nrl_train <- subset(nrl_data, as.numeric(round) <= nrl_train_ind )
 nrl_test <- subset(nrl_data, as.numeric(round) > nrl_train_ind )
 
-levels(as.factor(nrl_train$round))
-levels(as.factor(nrl_test$round))
+table(nrl_train$round)
+table(nrl_test$round)
 dim(nrl_train)
 dim(nrl_test)
 
-# nrl_holdout$tr is the training set indexes
-# nrl_tr <- nrl_data[nrl_holdout$tr,]
-# nrl_holdout$tr is the model test set indexes
-# nrl_ts <- nrl_data[nrl_holdout$ts,]
 
 # Run the glm Model 
 # Initally using the binomial logit fit for the match result
 
-# Remove other factors and character field for testing to run the model
+# Choose columns to run the model
 choose.columns <- c("for_match_result",
-                    "against_complete_sets",
-                    "against_drop_outs",
-                    "against_errors",
-                    "against_off_loads",
-                    "against_run_metres",
-                    "against_runs",
-                    "against_tackle_busts",
-                    "against_tackle_busts_per_run",
-                    "against_weighted_kicks",
-                    "for_complete_sets",
-                    "for_completion_rate",
-                    "for_errors",
-                    "for_forced_drop_outs",
-                    "for_line_breaks",
-                    "for_missed_tackles",
-                    "for_possession_percentage",
-                    "for_redzone_tackle_percent",
+                    "Home_Away",
+                    
+                    # Retained Features
                     "for_run_metres",
-                    "for_tackle_busts_per_run")
+                    "for_complete_sets",
+                    "for_inCompleteSets",
+                    "for_forced_drop_outs",
+                    "for_redzone_tackle_percent",
+                    "for_weighted_kicks",
+                    "for_oppHalf_tackle_percent",
+                    
+                    "against_run_metres",
+                    "against_complete_sets",
+                    "against_inCompleteSets",
+                    "against_forced_drop_outs",
+                    "against_redzone_tackle_percent",
+                    "against_weighted_kicks",
+                    "against_oppHalf_tackle_percent",
+                    
+                    # Testing Features
+                    
+                    "for_gang_tackle_ratio",
+                    "against_gang_tackle_ratio"
+                    
+                    
+                    
+                    )
 
-nrl_train_trim <- nrl_train[choose.columns]
-nrl_test_trim <- nrl_test[choose.columns]
+nrl_train_trim <- nrl_train[choose.columns] #nrl_train %>% select(c(-match_id:-match,-for_name,-against_name))  
+nrl_test_trim <- nrl_test[choose.columns] #nrl_test %>% select(c(-match_id:-match,-for_name,-against_name))
+
+# Filter for only the home team data to avoid duplication in the model
+nrl_train_trim <- nrl_train_trim %>% filter(Home_Away == "Home") %>% select(-Home_Away)
+nrl_test_trim <- nrl_test_trim %>% filter(Home_Away == "Home") %>% select(-Home_Away)
 
 dim(nrl_train_trim)
 dim(nrl_test_trim)
 
-contrasts(nrl_train_trim$for_match_result)
+contrasts(as.factor(nrl_train_trim$for_match_result))
 
 # Run Logit model
 
-model <- glm(for_match_result ~.,family=binomial(link='logit'),data=nrl_train_trim)
+model <- glm(as.factor(for_match_result) ~., data=nrl_train_trim , family="binomial"(link='logit'))
 
 # See summary of model to determine Deterministic (significant) Variables
 # Remember that in the logit model the response variable is log odds: 
@@ -84,26 +94,57 @@ summary(model)
 anova(model, test="Chisq")
 pR2(model)
 
+
 # Test the accuracy of the model using the test hold out cell
 
 fitted.results <- predict(model,nrl_test_trim,type='response')
-fitted.results2 <- ifelse(fitted.results > 0.5,"Lose","Win")
+fitted.results2 <- ifelse(fitted.results > 0.5,"Win","Lose")
 misClasificError <- mean(fitted.results2 != nrl_test_trim$for_match_result)
 print(paste('Accuracy',1-misClasificError))
 
-see_results <- data.frame(nrl_test$for_name, nrl_test$against_name,
-                          nrl_test$for_points, nrl_test$against_points,
-                          fitted.results, fitted.results2, nrl_test_trim)
+# chart/ print results and predictions 
+test_vs_model <- data.frame(nrl_test_trim$for_match_result,fitted.results)
+names(test_vs_model) <- c("actual","model")
+test_vs_model <- test_vs_model %>% mutate(actual_num = if_else(actual == "Win",1,0) )
 
-write.csv(see_results,file="../model_test_results.csv")
+ggplot(test_vs_model, aes(x = model, y = actual_num))+
+    geom_point() +
+    stat_smooth(method="glm", method.args=list(family="binomial"), se=FALSE)
 
 
-test1 <- ifelse(plot_data$prediction > 0.5, 1, 0)
-confusionMatrix(as.factor(test1), as.factor(plot_data$actual))
 
 
-dim(nrl_data)
 
-head(nrl_data[,1:7])
+# Build a ROC curve to graph model performance
+ROC <-roc(nrl_test_trim$for_match_result,fitted.results)
+plot(ROC, col="blue")
+auc(ROC)
 
+# Principal Component Analysis
+pr.train <- prcomp(x = nrl_train_trim[-1] , scale = TRUE, center = TRUE )
+summary(pr.train)
+
+biplot(pr.train)
+
+pr.var <- pr.train$sdev^2
+pve <- pr.var/sum(pr.var)
+
+plot(pve, xlab = "Principal Component", ylab = "Proportion of Variance Explained", type = "b")
+ggplot()
+
+train_results <- nrl_train_trim[1] %>% mutate(result = if_else(for_match_result == "Win",1,0) ) %>% select(result)
+
+plot(pr.train$x[, c(1, 2)], col = (train_results$result + 1) ,  xlab = "PC1", ylab = "PC2")
+plot(pr.train$x[, c(1, 3)], col = (train_results$result + 1) ,  xlab = "PC1", ylab = "PC3")
+
+
+nComp = 10
+mu = colMeans(nrl_train_trim[-1])
+  
+pr.train.hat = pr.train$x[,1:nComp] %*% t(pr.train$rotation[,1:nComp])
+pr.train.hat.s = scale(pr.train.hat, center = -mu, scale = FALSE)
+
+pr.train.hat.s[1,]
+nrl_train_trim[1,-1]
+mu
 

@@ -125,7 +125,7 @@ create.statsmatrix <-function(match_vector){
            ,teamA_gang_tackle_ratio = teamB_stats_df$teamB_tackles / teamA_stats_df$teamA_runs
            ,teamA_match_result = ifelse(teamA_stats_df$teamA_points > teamB_stats_df$teamB_points, "Win",
                                         ifelse(teamA_stats_df$teamA_points < teamB_stats_df$teamB_points, "Lose",
-                                               ifelse(teamA_stats_df$teamA_points < teamB_stats_df$teamB_points,"Draw",NA)))
+                                               ifelse(teamA_stats_df$teamA_points == teamB_stats_df$teamB_points,"Draw",NA)))
           )
   
   teamB_stats_df <- teamB_stats_df %>% 
@@ -144,7 +144,7 @@ create.statsmatrix <-function(match_vector){
            ,teamB_gang_tackle_ratio = teamA_stats_df$teamA_tackles / teamB_stats_df$teamB_runs
            ,teamB_match_result = ifelse(teamB_stats_df$teamB_points > teamA_stats_df$teamA_points, "Win",
                                         ifelse(teamB_stats_df$teamB_points < teamA_stats_df$teamA_points, "Lose",
-                                               ifelse(teamB_stats_df$teamB_points < teamA_stats_df$teamA_points,"Draw",NA)))
+                                               ifelse(teamB_stats_df$teamB_points == teamA_stats_df$teamA_points,"Draw",NA)))
           )
   
   #### set up array for both team for and against teams

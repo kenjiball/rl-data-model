@@ -3,11 +3,14 @@ install.packages(plyr)
 
 library(XLConnect)
 library(jsonlite)
-library(plyr)
+library(dplyr)
+library(lubridate)
 
+
+# Set working directory
+setwd(wd)
 getwd()
 
-# setwd("")
 
 
 # Load worksheet
@@ -61,78 +64,73 @@ odds_table$Away.Team <- gsub("St. George Illawarra Dragons", "St George Illawarr
 odds_table$Away.Team <- gsub("Sydney Roosters", "Sydney Roosters", odds_table$Away.Team, fixed=TRUE)
 odds_table$Away.Team <- gsub("Wests Tigers", "Wests Tigers", odds_table$Away.Team, fixed=TRUE)
 
-# Make add  start date time
-odds_table$start_datetime <-  as.POSIXct(paste( as.character(odds_table$Date), strftime(odds_table$Kick.off..local., format="%H:%M:%S"), sep=" "))
+# Rename columns
+names(odds_table)[names(odds_table) == "Date"] <- "match_start_date"
+names(odds_table)[names(odds_table) == "Home.Team"] <- "for_team_name"
+names(odds_table)[names(odds_table) == "Away.Team"] <- "against_team_name"
+names(odds_table)[names(odds_table) == "Kick.off..local."] <- "start_time"
+
+# Mutate to create new features
 
 
-
-# Build a Function to load scoring summary data to use to match and add more details
-
-create.matchmatrix <-function(match_vector){
-  # Create and empty data frame
-  output_df <- data.frame(match_id=character(), round=numeric(),round_name=character(),venue_name=character(),
-                               venue_city=character(), start_datetime = character(), start_date = character(),
-                               teamA_name=character() ,teamA_table_position=numeric(), teamA_halftime_score=numeric(),
-                               teamB_name=character() ,teamB_table_position=numeric(), teamB_halftime_score=numeric(), stringsAsFactors=FALSE )
-  scoringdata_df <- data.frame(match_id=character(), round=numeric(),round_name=character(),venue_name=character(),
-                               venue_city=character(), start_datetime = character(), start_date = character(),
-                               teamA_name=character() ,teamA_table_position=numeric(), teamA_halftime_score=numeric(),
-                               teamB_name=character() ,teamB_table_position=numeric(), teamB_halftime_score=numeric(), stringsAsFactors=FALSE )
-  
-  for(i in 1:length(match_vector)){   
-
-jsonFileName <- match_vector[i]
-jsonMatchData <- fromJSON(paste("scoringdata_",jsonFileName, ".json",sep = ""))
+#### Fix date formatting and start date time
+odds_table_2 <- odds_table %>% mutate(
+  start_date = floor_date(as.POSIXct(ymd(odds_table$match_start_date)),"day"),
+  start_time = hms(strftime(odds_table$start_time, format="%H:%M:%S")),
+  start_timedate = force_tz(ymd_hms(paste(match_start_date,start_time)), tzone = "Australia/Sydney")
+)
 
 
-
-# Load fox sports match data into the data frame
-scoringdata_df <- as.data.frame(cbind( jsonMatchData$scoring_summary$match_id
-                                      ,jsonMatchData$scoring_summary$round$number
-                                      , jsonMatchData$scoring_summary$round$name
-                                      , jsonMatchData$scoring_summary$venue$name
-                                      , jsonMatchData$scoring_summary$venue$city
-                                      , jsonMatchData$scoring_summary$match_start_date
-                                      , jsonMatchData$scoring_summary$match_start_date
-                                      , jsonMatchData$scoring_summary$team_A$name
-                                      , jsonMatchData$scoring_summary$team_A$competition_table_position
-                                      , jsonMatchData$scoring_summary$team_A$halftime_score
-                                      , jsonMatchData$scoring_summary$team_B$name
-                                      , jsonMatchData$scoring_summary$team_B$competition_table_position
-                                      , jsonMatchData$scoring_summary$team_B$halftime_score))
-# Define names
-names(scoringdata_df) <- c("match_id","round","round_name","venue_name","venue_city","start_datetime","start_date"
-                           ,"teamA_name","teamA_table_position","teamA_halftime_score","teamB_name","teamB_table_position","teamB_halftime_score")
-
-# Fix the date and time formats of start_datetime and start_date
-scoringdata_df$start_date <- as.Date(jsonMatchData$scoring_summary$match_start_date)
-
-T_split <- gregexpr(pattern = "T",scoringdata_df$start_datetime)[[1]][1]
-match_time <- substr(scoringdata_df$start_datetime,T_split+1,T_split+5)
-scoringdata_df$start_datetime <- as.POSIXct(paste( as.character(scoringdata_df$start_date),match_time , sep=" "))
-
-output_df <- rbind(output_df, scoringdata_df )
-
-  }
-  
-  return(output_df)
-}
-
-
-matchmatrix_season_2017 <- create.matchmatrix(season_2017)
-
-
-
-head(matchmatrix_season_2017)
-
-head(scoringdata_df)
-
-
-head(odds_table)
-
-## merged_data <- merge(matchmatrix_season_2017,odds_table, by.x = c("start_date","teamA_name","teamB_name"), by.y = c("Date","Home.Team","Away.Team"))
+#### Merge to season_all_matchmatrix
+col_args_1 <- season_all_matchmatrix %>% arrange(desc(match_start_date)) 
+col_args_2 <- odds_table_2 %>% arrange(desc(match_start_date))
+merged_data <- col_args_1 %>% inner_join(col_args_2, by = c("start_date","for_team_name","against_team_name") )
 
 head(merged_data)
+dim(merged_data)
 
 
+write.csv(merged_data,file="../merged_data.csv")
+
+
+
+# TESTING Basic PLots
+ggplot(merged_data, aes(x = Home.Line.Close, fill = for_match_result)) +
+  geom_histogram(binwidth = 4) +
+  facet_grid(for_match_result ~ .)
+
+ggplot(merged_data, aes(x = Home.Line.Close, y = (for_score - against_score) )) +
+  geom_point() +
+  facet_grid(for_match_result ~ .)
+
+
+# TESTING MERGE: 
+# Merge to season_all_matchmatrix
+col_args_1 <- season_all_matchmatrix %>% 
+  filter(season == 2018, round == 18 ) %>% 
+  select(match_start_date, start_date, start_datetime, for_team_name, against_team_name) %>% 
+  arrange(desc(start_datetime)) 
+
+col_args_2 <- odds_table_2 %>% 
+  filter(match_start_date >= "2018-07-13" & match_start_date <= "2018-07-16" ) %>% 
+  select(match_start_date, start_date, start_time, for_team_name, against_team_name) %>%
+  arrange(desc(start_date, start_time))
+
+
+merged_data <- col_args_1 %>% inner_join(col_args_2, by = c("start_date","for_team_name","against_team_name") )
+
+head(col_args_1)
+head(col_args_2)
+head(merged_data)
+
+dim(col_args_1)
+dim(col_args_2)
+dim(merged_data)
+
+class(col_args_1$start_date)
+class(col_args_2$start_date)
+
+
+head(col_args_1$start_date)
+head(col_args_2$start_date)
 

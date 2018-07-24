@@ -6,13 +6,12 @@ library(ggpmisc)
 
 # Data preparation
 plot_data <- season_all_datamatrix %>%
-                    select(for_name,season,round,for_match_result 
+                    select(Home_Away, for_name,season,round,for_match_result 
                           ,for_complete_sets,for_total_sets,for_points
                           ,against_complete_sets,against_total_sets,against_points) 
-head(plot_data)
 
 plot_data$round <- as.numeric(plot_data$round)
-names(plot_data)[1] <- "team"
+names(plot_data)[2] <- "team"
 
 # Prepare Season Win Totals for Aggregation
 plot_data$competition_points <- gsub("Win",2,plot_data$for_match_result)
@@ -44,8 +43,6 @@ plot_data4$completion_rate <- round(plot_data4$completion_rate,4)
 plot_data4$for_against <- round(plot_data4$for_against,4)
 plot_data5 <- plot_data4 %>% arrange(completion_rate)
 
-
-head(plot_data5,10)
 
 # Generate data for win/draw/loss probability metrics
 plot_data6 <- plot_data2 %>% mutate(for_completion_rate = for_complete_sets/for_total_sets
@@ -112,7 +109,7 @@ ggplot(plot_data6,
       geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.02) +
       geom_density(alpha=.2, fill="#FF6666") +
       geom_vline( aes(xintercept=mean(for_against_completion_rate)), linetype="dashed") +
-      facet_grid(for_match_result~.)
+      facet_grid(for_match_result~Home_Away)
 
 
 # r2d3 test

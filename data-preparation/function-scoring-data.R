@@ -11,6 +11,7 @@ library(jsonlite)
 library(dplyr)
 library(tidyr)
 library(purrr)
+library(lubridate)
 
 ##### Import local variables from file #####
 
@@ -200,8 +201,10 @@ create.matchmatrix <-function(match_vector){
   # Coerse any factors into character before the bind rows
   home_data <- home_data %>% mutate_if(sapply(home_data,is.factor), as.character)
   away_data <- away_data %>% mutate_if(sapply(away_data,is.factor), as.character)
-  
+
+
   # mutate to include match result
+  # Fix date formats using lubridate
   home_data <- home_data %>% mutate(
                 for_match_result = if_else(for_score > against_score, "Win",
                                    if_else(for_score < against_score, "Lose",
@@ -209,6 +212,8 @@ create.matchmatrix <-function(match_vector){
             against_match_result = if_else(against_score > for_score, "Win",
                                    if_else(against_score < for_score, "Lose",
                                    if_else(against_score == for_score ,"Draw",NULL))),
+                      start_date = floor_date(with_tz(ymd_hms(match_start_date), tzone = "Australia/Sydney"),"day"),
+                  start_datetime = with_tz(ymd_hms(match_start_date), tzone = "Australia/Sydney")
             )
   
   away_data <- away_data %>% mutate(
@@ -218,6 +223,8 @@ create.matchmatrix <-function(match_vector){
             against_match_result = if_else(against_score > for_score, "Win",
                                    if_else(against_score < for_score, "Lose",
                                    if_else(against_score == for_score ,"Draw",NULL))),
+                      start_date = floor_date(with_tz(ymd_hms(match_start_date), tzone = "Australia/Sydney"),"day"),
+                  start_datetime = with_tz(ymd_hms(match_start_date), tzone = "Australia/Sydney")
               )
               
   if(i == 1){
@@ -269,3 +276,5 @@ write.csv(season_all_matchmatrix,file="../season_all_matchmatrix.csv")
 write.csv(season_2018_matchmatrix,file="../season_2018_matchmatrix.csv")
 
 head(season_2018_matchmatrix,20)
+head(season_2018_matchmatrix $match_start_date)
+

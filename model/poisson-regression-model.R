@@ -4,7 +4,7 @@
 # https://gist.github.com/mick001/ac92e7c017aecff216fd
 
 # Load any required packages
-
+library(ggplot2)
 library(Amelia)
 library(rminer)
 library(pscl)
@@ -12,13 +12,23 @@ library(neuralnet)
 library(caret)
 library(dplyr)
 library(pROC)
-
+library(Rcpp)
+library(tidyr)
 
 # define the data set to be used
-nrl_data <- season_2017_datamatrix
-
+nrl_data <- season_all_datamatrix
+nrl_data <- nrl_data %>% filter(round <= 26 & season <= 2017 ) #%>% select(season) %>% table()
+  
 # Quick plot to observe if there is any missing data
-missmap(nrl_data, main = "Missing values vs observed")
+missmap_data <- nrl_data %>% 
+                filter(Home_Away == "Home")%>% 
+                select(for_tries
+                       # Retained Features
+                       , for_completion_rate, for_average_run_metres, for_tackle_busts_per_run, for_kick_metres
+                       , for_possession_percentage, for_play_the_balls, for_tackledOpp20
+                )
+
+missmap(missmap_data, main = "Missing values vs observed")
 
 # Define a training set and the hold out set
 # holdout set MUST be ORDERED and by Round
@@ -45,11 +55,10 @@ nrl_train_trim_m1 <- nrl_train %>%
   filter(Home_Away == "Home")%>% 
   select(for_tries
          # Retained Features
-         , for_completion_rate, for_average_run_metres, for_tackle_busts_per_run, for_run_metres_success_rate
+         , for_completion_rate, for_average_run_metres, for_tackle_busts_per_run, for_kick_metres
+         , for_possession_percentage, for_play_the_balls, for_tackledOpp20
 
   )
-
-
 
 # model 2 training set
 
@@ -57,19 +66,28 @@ nrl_train_trim_m2 <- nrl_train %>%
                    filter(Home_Away == "Home")%>% 
                    select(for_tries
                           # Retained Features
-                          , for_completion_rate, for_average_run_metres, for_tackle_busts_per_run, for_run_metres_success_rate
+                          , for_completion_rate, for_average_run_metres, for_tackle_busts_per_run, for_kick_metres
+                          , for_possession_percentage, for_play_the_balls, for_tackledOpp20
                           # Testing Features
-                          , for_penaltiesAwarded #, for_runs_8plus_meters, for_penaltiesAwarded, for_tackledOpp20
+                          , for_territory
                    )
+
 # set set holout data
 nrl_test_trim <-    nrl_test %>% 
                     filter(Home_Away == "Home")%>% 
-                    select(for_tries)
+                    select(for_tries
+                           # Retained Features
+                           , for_completion_rate, for_average_run_metres, for_tackle_busts_per_run, for_kick_metres
+                           , for_possession_percentage, for_play_the_balls, for_tackledOpp20
+                           # Testing Features
+                           , for_territory
+                    )
 
 
 #all_equal(nrl_test_trim_m1,nrl_test_trim2, convert = TRUE, ignore_col_order = TRUE)
 
-contrasts(as.factor(nrl_train_trim$for_tries))
+contrasts(as.factor(nrl_train_trim_m1$for_tries))
+table(as.factor(nrl_train_trim_m1$for_tries))
 
 # Run Logit model m1 and m2
 
@@ -89,27 +107,36 @@ pR2(model_m1)
 pR2(model_m2)
 
 # Test the accuracy of the model using the test hold out cell
-nrl_test_trim$predicted_tries_m1 <-  predict(model_m1,nrl_test_trim_m1,type='response')
-nrl_test_trim$predicted_tries_m2 <-  predict(model_m2,nrl_test_trim_m2,type='response')
+nrl_test_trim$predicted_tries_m1 <-  predict(model_m1,nrl_test_trim,type='response')
+nrl_test_trim$predicted_tries_m2 <-  predict(model_m2,nrl_test_trim,type='response')
 
 cor(nrl_test_trim$for_tries,nrl_test_trim$predicted_tries_m1)
 cor(nrl_test_trim$for_tries,nrl_test_trim$predicted_tries_m2)
 
 # chart/ print results and predictions 
-gather(nrl_test_trim, model, predicted_tries, -for_tries ) #####
+nrl_test_trim_plot <- nrl_test_trim %>%
+                      select(for_tries, predicted_tries_m1, predicted_tries_m2) %>%
+                      gather(model, predicted_tries, -for_tries)
 
 
-ggplot(nrl_test_trim, aes(x = as.factor(for_tries), y = predicted_tries_m1))+
-  geom_boxplot() +
-  geom_abline(slope=1, intercept = 1 ) +
+
+ggplot(nrl_test_trim_plot, aes(x = as.factor(for_tries), y = predicted_tries))+
+  geom_boxplot(aes(col = model)) +
+  geom_rug() +
+  #facet_grid(model ~ .)+
+  geom_abline(slope=1, intercept = min(nrl_test_trim_plot$for_tries) -1 ) +
   expand_limits(x = 0, y = 0)
 
 
 # Build a ROC curve to graph model performance
-ROC <-roc(nrl_test_trim2$for_tries,nrl_test_trim2$predicted_tries)
-plot.new()
-plot(ROC, col="blue")
-auc(ROC)
+ROC_m1 <-roc(nrl_test_trim$for_tries,nrl_test_trim$predicted_tries_m1, levels = c(3,4))
+ROC_m2 <-roc(nrl_test_trim$for_tries,nrl_test_trim$predicted_tries_m2, levels = c(3,4))
 
+plot.new()
+plot.roc(ROC_m1, col="blue")
+plot.new()
+plot.roc(ROC_m2, col="blue")
+auc(ROC_m1)
+auc(ROC_m2)
 
 

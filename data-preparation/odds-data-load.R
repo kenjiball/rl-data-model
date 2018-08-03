@@ -99,9 +99,19 @@ ggplot(merged_data, aes(x = Home.Line.Close, fill = for_match_result)) +
   geom_histogram(binwidth = 4) +
   facet_grid(for_match_result ~ .)
 
-ggplot(merged_data, aes(x = Home.Line.Close, y = (for_score - against_score) )) +
-  geom_point() +
-  facet_grid(for_match_result ~ .)
+merged_data %>%
+  select(season, Home.Line.Close, for_score, against_score) %>%
+  mutate(Line.Interval = findInterval(Home.Line.Close, vec = -6:6*4),
+         Line.Interval.Index = findInterval(Home.Line.Close, vec = -6:6*4) 
+         ) %>%
+  
+  
+  ggplot(aes(x = Home.Line.Close, y = (for_score - against_score) )) +
+  geom_point()
+
+    
+
+  table(findInterval(merged_data$Home.Line.Close, vec = -6:6*4))
 
 
 # TESTING MERGE: 

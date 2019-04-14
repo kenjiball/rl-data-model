@@ -11,10 +11,12 @@ library(pscl)
 library(neuralnet)
 library(caret)
 library(dplyr)
+library(ROCR)
 library(pROC)
+library(ggplot2)
 
 # define the data set to be used
-nrl_data <- season_2018_datamatrix
+nrl_data <- season_all_datamatrix
 
 # Quick plot to observe if there is any missing data
 missmap(nrl_data, main = "Missing values vs observed")
@@ -24,7 +26,7 @@ missmap(nrl_data, main = "Missing values vs observed")
 # nrl_holdout <- holdout(nrl_data$match_id, ratio = 4/5, internalsplit = FALSE, mode = "random",  seed = 2)
 
 round_factors <- levels(as.factor(nrl_data$round))
-ratio <- 3/4
+ratio <- 3/5
 nrl_train_ind <- floor(length(round_factors)*ratio)
 nrl_train <- subset(nrl_data, as.numeric(round) <= nrl_train_ind )
 nrl_test <- subset(nrl_data, as.numeric(round) > nrl_train_ind )
@@ -130,7 +132,7 @@ pr.var <- pr.train$sdev^2
 pve <- pr.var/sum(pr.var)
 
 plot(pve, xlab = "Principal Component", ylab = "Proportion of Variance Explained", type = "b")
-ggplot()
+
 
 train_results <- nrl_train_trim[1] %>% mutate(result = if_else(for_match_result == "Win",1,0) ) %>% select(result)
 

@@ -6,6 +6,7 @@ library(jsonlite)
 
 
 ##### Import local variables from file #####
+wd <- "/Users/ballk/OneDrive - Tabcorp/Documents/rl-data-model/data"
 
 setwd(wd)
 getwd()

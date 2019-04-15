@@ -107,9 +107,11 @@ extract_nrl_match_data <- function(input_list,match_num){
                              replace_null(input_list[[match_num]]$homeTeam$teamId, 0),
                              replace_null(input_list[[match_num]]$homeTeam$name, 'NA'),
                              replace_null(input_list[[match_num]]$homeTeam$nickName, 'NA'),
+                             replace_null(input_list[[match_num]]$homeTeam$theme$key, 'NA'),
                              replace_null(input_list[[match_num]]$awayTeam$teamId, 0),
                              replace_null(input_list[[match_num]]$awayTeam$name, 'NA'),
                              replace_null(input_list[[match_num]]$awayTeam$nickName, 'NA'),
+                             replace_null(input_list[[match_num]]$awayTeam$theme$key, 'NA'),
                              replace_null(input_list[[match_num]]$venue, 'NA'),
                              replace_null(input_list[[match_num]]$startTime, 'NA'),
                              replace_null(input_list[[match_num]]$hashTag, 'NA'),
@@ -123,8 +125,8 @@ extract_nrl_match_data <- function(input_list,match_num){
                              replace_null(input_list[[match_num]]$homeTeam$captainPlayerId, 0),
                              replace_null(input_list[[match_num]]$awayTeam$captainPlayerId, 0))
   
-  names(match_data) <- c("matchId","competitionId","roundNumber","roundTitle","homeId","homeTeam","homeNickName","awayId","awayTeam",
-                         "awayNickName","venue","startTime","hashTag","weather","groundConditions","attendance","homeScore","awayScore",
+  names(match_data) <- c("matchId","competitionId","roundNumber","roundTitle","homeId","homeTeam","homeNickName","homeKey","awayId","awayTeam",
+                         "awayNickName","awayKey","venue","startTime","hashTag","weather","groundConditions","attendance","homeScore","awayScore",
                          "homeHTScore","awayHTScore","homeCaptainId","awayCaptainId")
   
   return(match_data)
@@ -159,6 +161,14 @@ extract_nrl_player_data <- function(input_list,match_num){
   away_df <- inner_join(away_meta_data, away_stats, by = "playerId")
   
   player_df <- bind_rows(home_df, away_df)
+  
+  # add some basic features
+  player_df <- player_df %>% 
+    mutate(positionGroups = case_when(position %in% c("Fullback","Winger","Centre","Five-Eighth","Halfback") ~ "Backs",
+                                       position %in% c("2nd Row","Hooker","Lock","Prop") ~ "Forwards",
+                                       position %in% c("Interchange") ~ "Interchange",
+                                       TRUE ~ "NA" )
+          )
   
   return(player_df)
   

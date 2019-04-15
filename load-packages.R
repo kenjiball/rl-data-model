@@ -1,0 +1,27 @@
+# Load and Install required packages for use.
+# Require pacman and pload a list of package names.
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+    broom
+  , curl
+  , DT
+  , dplyr
+  , ggimage
+  , ggplot2
+  , ggpubr
+  , ggthemes
+  , jsonlite
+  , lubridate
+  , purrr
+  , qdapTools
+  , readr
+  , RCurl
+  , ROCR
+  , rsvg
+  , stringr
+  , tibble
+  , tictoc
+  , tidyr
+  , zoo)
+

@@ -8,6 +8,8 @@ library(tidyr)
 library(qdapTools)
 library(ggplot2)
 library(ggthemes)
+library(ggimage)
+library(rsvg)
 
 ##### Import local variables from file #####
 wd <- "/Users/ballk/OneDrive - Tabcorp/Documents/rl-data-model/official-data"
@@ -107,8 +109,6 @@ player_df <- bind_rows(player_2013_df, player_2014_df, player_2015_df, player_20
 
 
 
-
-
 # More data not currently extracted
 match_data_2019[[25]]$timeline
 
@@ -145,24 +145,63 @@ player_df %>%
   summarise( total_tries = sum(tries, na.rm = TRUE)) %>% 
   arrange(desc(total_tries))
 
-
+# Team score distribution
 match_table_df %>%
   ggplot(aes(homeScore)) +
   geom_histogram(binwidth = 2)
   
 
+# Errors per game
+match_table_df_2 %>% 
+  inner_join(player_df, by = "matchId") %>% 
+  mutate(team_url = if_else(homeAway == "Home", home_team_logo_url,away_team_logo_url) ) %>% 
+  select(year, matchId, name, homeAway, team_url, errors, tries) %>%
+  group_by(year, name, team_url) %>% 
+  filter(year >= 2016) %>% 
+  summarise( count = n(),
+             games = n_distinct(matchId),
+             errors = sum(errors, na.rm = TRUE),
+             tries  = sum(tries, na.rm = TRUE),
+             errors_per_game = errors/games,
+             errors_per_tries = errors/tries
+             ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = year, y= errors_per_tries)) +
+  geom_image(aes(image=team_url), size=.035)
+
+
 
 names(player_df)
+names(match_table_df)
+
+# Kick return metres vs hit up metres
 
 
-# Create some basic features
+match_table_df_2 %>% 
+  inner_join(player_df, by = "matchId") %>%
+  filter(allRuns > 3 ) %>% 
+  select( year, firstName, lastName, playerId, position, positionGroups, allRuns, allRunMetres, 
+          kickReturnMetres, hitUps, hitUpRunMetres, dummyHalfRuns, dummyHalfRunMetres, postContactMetres ) %>%
+  mutate( allRunMetresPerRun = allRunMetres/allRuns ) %>% 
+  ggplot(aes(x=allRunMetresPerRun))+
+    geom_histogram(binwidth = 1) + 
+    facet_grid(positionGroups ~.) +
+    xlim(0,20)
+
+summary(player_df$hitUpRunMetres)
+
+#### Create some basic features
 match_table_df_2 <- match_table_df %>% 
   mutate(
+    year       = substr(matchId,1,4),
     homeResult = case_when( homeScore > awayScore ~ 'Win',
                             homeScore < awayScore ~ 'Lose',
                             homeScore == awayScore ~ 'Draw',
-                            TRUE ~ 'NA')
+                            TRUE ~ 'NA'),
+    home_team_logo_url = paste0(image_url, homeKey, "-badge.svg"),
+    away_team_logo_url = paste0(image_url, awayKey, "-badge.svg")
   )
 
-### build basic logistic regression model
+
+
 

@@ -9,12 +9,10 @@ library(xml2)
 library(base64)
 library(RCurl)
 
-# NRL Heatmap data url
-# https://app-live-nrl.yinzcam.com/V1/HeatMap/Game/20191110410?teamId=500001&isMatchCentreHeatmap=true&offenseDefence=DEFENCE&period=FIRST_HALF&category=MISSED_TACKLES&ff=mobile&mnc=0&app_version=3.3.2&carrier=&version=4.7&width=360&height=640&os_version=5.0&mcc=0&application=NRL_LIVE&os=Android
 
 # category MISSED_TACKLES
 
-test_url <- paste0("https://app-live-nrl.yinzcam.com/V1/HeatMap/Game/",
+test_url <- paste0(heatmap_url,
 "20191110410?",
 "teamId=500001&",
 "isMatchCentreHeatmap=true&",

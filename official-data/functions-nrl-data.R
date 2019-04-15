@@ -9,10 +9,10 @@
 # this function allows the user to get or update a list of categorical variables used to get NRL data
 # Can be called to get team, round, comp or season info.
 
-get_nrl_id_info <- function(type = c("team","round","comp","season")){
+get_nrl_id_info <- function(type = c("team","round","comp","season"), draw_url_in){
   
   # Call api for the json file and convert to list
-  nrl_id_info_json <- fromJSON("https://www.nrl.com/draw/data")
+  nrl_id_info_json <- fromJSON(draw_url_in)
   
   # Build data frame for id's and names
   
@@ -52,11 +52,11 @@ get_nrl_id_info <- function(type = c("team","round","comp","season")){
 ##### Get NRL Draw by comp, year, team
 # Function: get_nrl_draw
 
-get_nrl_draw <- function(competition_id, season_id, lookup_id, type = c("round","team")){
+get_nrl_draw <- function(competition_id, season_id, lookup_id, type = c("round","team"), draw_url_in){
   
   # Set up the url_string to get draw information by comp, season, team
-  draw_url_string <- paste0("https://www.nrl.com/draw/data?",
-                            "competition=", competition_id,
+  draw_url_string <- paste0(draw_url_in,
+                            "?competition=", competition_id,
                             "&season=", season_id,
                             "&", type, "=", lookup_id)
   # Get Json team file and convert to List
@@ -72,10 +72,10 @@ get_nrl_draw <- function(competition_id, season_id, lookup_id, type = c("round",
 ##### Get NRL match data
 # Function: get_nrl_match_data
 
-get_nrl_match_data <- function(match_url){
+get_nrl_match_data <- function(match_url, web_url_in){
   
   # Set up the url_string to get draw information by comp, season, team
-  draw_url_string <- paste0("https://www.nrl.com", match_url, "data")
+  draw_url_string <- paste0(web_url_in, match_url, "data")
   # Get Json team file and convert to List
   nrl_match_json <- fromJSON(draw_url_string)
   

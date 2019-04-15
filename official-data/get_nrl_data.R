@@ -20,38 +20,38 @@ source(functions-nrl-data.R)
 
 
 # get reference dfs.
-nrl_team_id_df   <- get_nrl_id_info("team")
-nrl_round_id_df  <- get_nrl_id_info("round")
-nrl_comp_id_df   <- get_nrl_id_info("comp")
-nrl_season_id_df <- get_nrl_id_info("season")
+nrl_team_id_df   <- get_nrl_id_info("team", draw_url)
+nrl_round_id_df  <- get_nrl_id_info("round", draw_url)
+nrl_comp_id_df   <- get_nrl_id_info("comp", draw_url)
+nrl_season_id_df <- get_nrl_id_info("season", draw_url)
 
 
 # Getting nrl draw as a list
-# draw_2019_team <- lapply(1:16 , function(i)get_nrl_draw(111,2019,i, "team"))
-draw_2010_round <- lapply(1:30 , function(i)get_nrl_draw(111,2010,i, "round"))
-draw_2011_round <- lapply(1:30 , function(i)get_nrl_draw(111,2011,i, "round"))
-draw_2012_round <- lapply(1:30 , function(i)get_nrl_draw(111,2012,i, "round"))
+# draw_2019_team <- lapply(1:16 , function(i)get_nrl_draw(111,2019,i, "team"), draw_url)
+draw_2010_round <- lapply(1:30 , function(i)get_nrl_draw(111,2010,i, "round"), draw_url)
+draw_2011_round <- lapply(1:30 , function(i)get_nrl_draw(111,2011,i, "round"), draw_url)
+draw_2012_round <- lapply(1:30 , function(i)get_nrl_draw(111,2012,i, "round"), draw_url)
 
 # match and player data only beginfs from 2013 season
-draw_2013_round <- lapply(1:30 , function(i)get_nrl_draw(111,2013,i, "round"))
-draw_2014_round <- lapply(1:30 , function(i)get_nrl_draw(111,2014,i, "round"))
-draw_2015_round <- lapply(1:30 , function(i)get_nrl_draw(111,2015,i, "round"))
-draw_2016_round <- lapply(1:30 , function(i)get_nrl_draw(111,2016,i, "round"))
-draw_2017_round <- lapply(1:30 , function(i)get_nrl_draw(111,2017,i, "round"))
-draw_2018_round <- lapply(1:29 , function(i)get_nrl_draw(111,2018,i, "round"))
+draw_2013_round <- lapply(1:30 , function(i)get_nrl_draw(111,2013,i, "round"), draw_url)
+draw_2014_round <- lapply(1:30 , function(i)get_nrl_draw(111,2014,i, "round"), draw_url)
+draw_2015_round <- lapply(1:30 , function(i)get_nrl_draw(111,2015,i, "round"), draw_url)
+draw_2016_round <- lapply(1:30 , function(i)get_nrl_draw(111,2016,i, "round"), draw_url)
+draw_2017_round <- lapply(1:30 , function(i)get_nrl_draw(111,2017,i, "round"), draw_url)
+draw_2018_round <- lapply(1:29 , function(i)get_nrl_draw(111,2018,i, "round"), draw_url)
 
-draw_2019_round <- lapply(1:4  , function(i)get_nrl_draw(111,2019,i, "round"))
+draw_2019_round <- lapply(1:4  , function(i)get_nrl_draw(111,2019,i, "round"), draw_url)
 
 
 # get Match URLs to get match data
-match_url_lookup_2013 <- lapply( 1:30, function(i) unlist(draw_2013_round[[i]]$matchCentreUrl))
-match_url_lookup_2014 <- lapply( 1:30, function(i) unlist(draw_2014_round[[i]]$matchCentreUrl))
-match_url_lookup_2015 <- lapply( 1:30, function(i) unlist(draw_2015_round[[i]]$matchCentreUrl))
-match_url_lookup_2016 <- lapply( 1:30, function(i) unlist(draw_2016_round[[i]]$matchCentreUrl))
-match_url_lookup_2017 <- lapply( 1:30, function(i) unlist(draw_2017_round[[i]]$matchCentreUrl))
-match_url_lookup_2018 <- lapply( 1:29, function(i) unlist(draw_2018_round[[i]]$matchCentreUrl))
+match_url_lookup_2013 <- lapply( 1:30, function(i) unlist(draw_2013_round[[i]]$matchCentreUrl), web_url)
+match_url_lookup_2014 <- lapply( 1:30, function(i) unlist(draw_2014_round[[i]]$matchCentreUrl), web_url)
+match_url_lookup_2015 <- lapply( 1:30, function(i) unlist(draw_2015_round[[i]]$matchCentreUrl), web_url)
+match_url_lookup_2016 <- lapply( 1:30, function(i) unlist(draw_2016_round[[i]]$matchCentreUrl), web_url)
+match_url_lookup_2017 <- lapply( 1:30, function(i) unlist(draw_2017_round[[i]]$matchCentreUrl), web_url)
+match_url_lookup_2018 <- lapply( 1:29, function(i) unlist(draw_2018_round[[i]]$matchCentreUrl), web_url)
 
-match_url_lookup_2019 <- lapply( 1:4 , function(i) unlist(draw_2019_round[[i]]$matchCentreUrl))
+match_url_lookup_2019 <- lapply( 1:4 , function(i) unlist(draw_2019_round[[i]]$matchCentreUrl), web_url)
 
 
 ### get match data into list

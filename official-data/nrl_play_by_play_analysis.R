@@ -41,7 +41,7 @@ table(transitionDataset_2$penalties_per_set)
 
 # metres gained distribution
 transitionDataset_2 %>% 
-  filter(penalties_per_set == 1 & metres_gained > 0) %>% 
+  filter(penalties_per_set == 0 & metres_gained > 0) %>% 
   select(set_id, metres_gained, total_tries_per_set, penalties_per_set) %>% 
   distinct() %>% 
   ggplot( aes(x = metres_gained) ) +

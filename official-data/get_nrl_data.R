@@ -1,15 +1,7 @@
 # Get data using the Stats API and Key
 
 # Call packages
-library(curl)
-library(jsonlite)
-library(dplyr)
-library(tidyr)
-library(qdapTools)
-library(ggplot2)
-library(ggthemes)
-library(ggimage)
-library(rsvg)
+source("./load-packages.R")
 
 ##### Import local variables from file #####
 wd <- "/Users/ballk/OneDrive - Tabcorp/Documents/rl-data-model/official-data"
@@ -110,6 +102,8 @@ player_df <- bind_rows(player_2013_df, player_2014_df, player_2015_df, player_20
 
 
 # More data not currently extracted
+match_data_2019[[25]]$stats$groups$stats
+
 match_data_2019[[25]]$timeline
 
 match_data_2019[[22]]$officials
@@ -122,7 +116,7 @@ match_data_2019[[22]]$homeTeam$captainPlayerId
 
 
 
-### ggplot
+### play the ball speed by team and position
 mu <- player_df %>%
   filter(playTheBallAverageSpeed > 0 & playTheBallAverageSpeed < 6) %>% 
   mutate( total_playTheBall_time = playTheBallTotal*playTheBallAverageSpeed) %>% 
@@ -138,6 +132,31 @@ player_df %>%
   facet_grid(position~., scales = "free") + 
   scale_color_manual(values=c(rainbow(16)))
   
+### play the ball speed by team and season
+mu <- match_table_df_2 %>% 
+  inner_join(player_df, by = "matchId") %>%
+  filter(playTheBallAverageSpeed > 0 & playTheBallAverageSpeed < 6) %>% 
+  mutate( total_playTheBall_time = playTheBallTotal*playTheBallAverageSpeed,
+          oppositionTeam = if_else(name == homeTeam, awayTeam, homeTeam),
+          oppositionTeam_is_souths  = if_else(oppositionTeam == 'South Sydney Rabbitohs', TRUE, FALSE)
+          ) %>% 
+  group_by(oppositionTeam_is_souths, year) %>% 
+  summarise( grp.mean=mean(playTheBallAverageSpeed),
+             total.mean = sum(total_playTheBall_time)/sum(playTheBallTotal)  )
+
+match_table_df_2 %>% 
+  inner_join(player_df, by = "matchId") %>%
+  filter(playTheBallAverageSpeed > 0 & playTheBallAverageSpeed < 6) %>% 
+  mutate( total_playTheBall_time = playTheBallTotal*playTheBallAverageSpeed,
+          oppositionTeam = if_else(name == homeTeam, awayTeam, homeTeam),
+          oppositionTeam_is_souths  = if_else(oppositionTeam == 'South Sydney Rabbitohs', TRUE, FALSE)
+  ) %>% 
+  ggplot(aes(playTheBallAverageSpeed , color = oppositionTeam_is_souths)) +
+  geom_density() +
+  geom_vline(data=mu, aes(xintercept=total.mean, color= oppositionTeam_is_souths), linetype="dashed") +
+  facet_grid(year~., scales = "free") #+ 
+  #scale_color_manual(values=c(rainbow(2)))
+
 
 
 player_df %>% 
@@ -151,7 +170,7 @@ match_table_df %>%
   geom_histogram(binwidth = 2)
   
 
-# Errors per game
+# Errors per try plot
 match_table_df_2 %>% 
   inner_join(player_df, by = "matchId") %>% 
   mutate(team_url = if_else(homeAway == "Home", home_team_logo_url,away_team_logo_url) ) %>% 
@@ -189,6 +208,27 @@ match_table_df_2 %>%
     xlim(0,20)
 
 summary(player_df$hitUpRunMetres)
+
+# Effective tackle rate
+player_df %>% 
+  select( playerId, position, positionGroups, tacklesMade, missedTackles, ineffectiveTackles, tackleEfficiency ) %>%
+  group_by(playerId) %>% 
+  summarise( tacklesMade = sum(tacklesMade, na.rm = TRUE),
+             missedTackles = sum(missedTackles, na.rm = TRUE),
+             ineffectiveTackles = sum(ineffectiveTackles, na.rm = TRUE),
+             tackleEfficiency = tacklesMade / (tacklesMade + missedTackles + ineffectiveTackles)
+             ) %>% 
+  ungroup() %>% 
+  filter(tacklesMade > 20) %>% 
+  ggplot(aes(tackleEfficiency)) +
+  geom_histogram(binwidth = 0.02)
+
+
+
+
+
+
+
 
 #### Create some basic features
 match_table_df_2 <- match_table_df %>% 

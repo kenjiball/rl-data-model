@@ -34,8 +34,10 @@ draw_2016_round <- lapply(1:30 , function(i)get_nrl_draw(111,2016,i, "round", dr
 draw_2017_round <- lapply(1:30 , function(i)get_nrl_draw(111,2017,i, "round", draw_url))
 draw_2018_round <- lapply(1:29 , function(i)get_nrl_draw(111,2018,i, "round", draw_url))
 
-draw_2019_round <- lapply(1:5  , function(i)get_nrl_draw(111,2019,i, "round", draw_url))
+draw_2019_round <- lapply(1:25  , function(i)get_nrl_draw(111,2019,i, "round", draw_url))
 
+# set rounds
+rounds <- 1:5
 
 # get Match URLs to get match data
 match_url_lookup_2013 <- lapply( 1:30, function(i) unlist(draw_2013_round[[i]]$matchCentreUrl))
@@ -45,7 +47,7 @@ match_url_lookup_2016 <- lapply( 1:30, function(i) unlist(draw_2016_round[[i]]$m
 match_url_lookup_2017 <- lapply( 1:30, function(i) unlist(draw_2017_round[[i]]$matchCentreUrl))
 match_url_lookup_2018 <- lapply( 1:29, function(i) unlist(draw_2018_round[[i]]$matchCentreUrl))
 
-match_url_lookup_2019 <- lapply( 1:5 , function(i) unlist(draw_2019_round[[i]]$matchCentreUrl))
+match_url_lookup_2019 <- lapply( rounds , function(i) unlist(draw_2019_round[[i]]$matchCentreUrl))
 
 
 ### get match data into list
@@ -57,7 +59,7 @@ match_urls_2016 <- unlist(match_url_lookup_2016[1:30])[!is.na(unlist(match_url_l
 match_urls_2017 <- unlist(match_url_lookup_2017[1:30])[!is.na(unlist(match_url_lookup_2017[1:30]))]
 match_urls_2018 <- unlist(match_url_lookup_2018[1:29])[!is.na(unlist(match_url_lookup_2018[1:29]))]
 
-match_urls_2019 <- unlist(match_url_lookup_2019[1:5])[!is.na(unlist(match_url_lookup_2019[1:5 ]))]
+match_urls_2019 <- unlist(match_url_lookup_2019[rounds])[!is.na(unlist(match_url_lookup_2019[rounds]))]
 
 # get nrl match data
 match_data_2013 <- lapply(match_urls_2013, function(i)get_nrl_match_data(i, web_url))
@@ -70,6 +72,9 @@ match_data_2018 <- lapply(match_urls_2018, function(i)get_nrl_match_data(i, web_
 match_data_2019 <- lapply(match_urls_2019, function(i)get_nrl_match_data(i, web_url))
 
 #### Extract Match data
+# define number of mataches for current season
+matches <- 1:length(match_urls_2019)
+
 match_table_2010_df <- list_df2df(lapply(1:201, function(i)extract_nrl_match_data(match_data_2010,i)))
 
 match_table_2013_df <- list_df2df(lapply(1:201, function(i)extract_nrl_match_data(match_data_2013,i)))
@@ -79,7 +84,7 @@ match_table_2016_df <- list_df2df(lapply(1:201, function(i)extract_nrl_match_dat
 match_table_2017_df <- list_df2df(lapply(1:201, function(i)extract_nrl_match_data(match_data_2017,i)))
 match_table_2018_df <- list_df2df(lapply(1:201, function(i)extract_nrl_match_data(match_data_2018,i)))
 
-match_table_2019_df <- list_df2df(lapply(1:40, function(i)extract_nrl_match_data(match_data_2019,i)))
+match_table_2019_df <- list_df2df(lapply(matches, function(i)extract_nrl_match_data(match_data_2019,i)))
 
 match_table_df <- bind_rows(match_table_2013_df, match_table_2014_df, match_table_2015_df, match_table_2016_df,
                             match_table_2017_df, match_table_2018_df, match_table_2019_df)
@@ -92,12 +97,23 @@ player_2016_df <- bind_rows(lapply(1:201, function(i)extract_nrl_player_data(mat
 player_2017_df <- bind_rows(lapply(1:201, function(i)extract_nrl_player_data(match_data_2017,i)))
 player_2018_df <- bind_rows(lapply(1:201, function(i)extract_nrl_player_data(match_data_2018,i)))
 
-player_2019_df <- bind_rows(lapply(1:40, function(i)extract_nrl_player_data(match_data_2019,i)))
+player_2019_df <- bind_rows(lapply(matches, function(i)extract_nrl_player_data(match_data_2019,i)))
 
 player_df <- bind_rows(player_2013_df, player_2014_df, player_2015_df, player_2016_df,
                             player_2017_df, player_2018_df, player_2019_df)
 
 
+# Extract current season data and upload to drive
+
+
+# Load data to Googledrive
+
+# use googledrive package to upload file to drive
+upload_to_drive(transitionDataset, gdrive_path_id)
+
+
+
+# Download data from Google drive
 
 
 

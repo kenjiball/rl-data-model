@@ -174,4 +174,23 @@ extract_nrl_player_data <- function(input_list,match_num){
   
 }
 
+### Function to upload data files to google drive
+
+upload_to_drive <- function(upload_data, upload_path){
+  
+  # Define file name
+  file_name <- paste0("./",deparse(substitute(upload_data)),".csv")
+  
+  # temporarily write file to directory
+  write_csv(upload_data, file_name)
+  
+  # Upload file to drive
+  drive_upload( media = file_name, path  = as_id(upload_path), type = "spreadsheet")
+  
+  # Remove csv file from directory
+  file.remove(file_name)
+  
+  print(paste0("Successfully uploaded file: ",deparse(substitute(upload_data))))
+  
+}
 

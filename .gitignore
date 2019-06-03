@@ -5,3 +5,4 @@
 masking_file.R
 *.csv
 *.xlsx
+.httr-oauth

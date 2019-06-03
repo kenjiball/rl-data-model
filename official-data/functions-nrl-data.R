@@ -194,3 +194,28 @@ upload_to_drive <- function(upload_data, upload_path){
   
 }
 
+### Function to download data files to google drive
+
+download_from_drive <- function(download_data){
+  
+  # Define file name
+  file_name <- paste0("./",download_data,".csv")
+  
+  # temporarily download file to directory
+  drive_download(download_data, type = "csv")
+  
+  # Upload file to drive
+  outputdf <- read_csv(file_name)
+  
+  # Remove csv file from directory
+  file.remove(file_name)
+  
+  print(paste0("Successfully uploaded file: ",file_name))
+  
+  return(outputdf)
+  
+}
+
+
+
+

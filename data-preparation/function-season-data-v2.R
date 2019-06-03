@@ -3,13 +3,10 @@
 # Major Overhaul: Improve function by using tidyverse packages
 
 # Call packages
-library(jsonlite)
-library(dplyr)
-library(tidyr)
-library(purrr)
+source("./load-packages.R")
 
 # Set working directory
-setwd(wd)
+setwd(wd_data)
 getwd()
 
 # Function to run season data into a single file
@@ -207,6 +204,8 @@ season_2015_datamatrix <- create.statsmatrix(season_2015)
 season_2016_datamatrix <- create.statsmatrix(season_2016)
 season_2017_datamatrix <- create.statsmatrix(season_2017)
 season_2018_datamatrix <- create.statsmatrix(season_2018)
+season_2019_datamatrix <- create.statsmatrix(season_2019)
+
 
 # Row binds to combin into a all data matrix
 season_all_datamatrix <- bind_rows(season_2011_datamatrix
@@ -216,7 +215,8 @@ season_all_datamatrix <- bind_rows(season_2011_datamatrix
                                     ,season_2015_datamatrix
                                     ,season_2016_datamatrix
                                     ,season_2017_datamatrix
-                                    ,season_2018_datamatrix )
+                                    ,season_2018_datamatrix
+                                    ,season_2019_datamatrix)
 
 # dim(season_2010_datamatrix)
 dim(season_2011_datamatrix)
@@ -227,6 +227,7 @@ dim(season_2015_datamatrix)
 dim(season_2016_datamatrix) 
 dim(season_2017_datamatrix)
 dim(season_2018_datamatrix)
+dim(season_2019_datamatrix)
 dim(season_all_matchmatrix)
 
 

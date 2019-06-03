@@ -6,3 +6,7 @@ masking_file.R
 *.csv
 *.xlsx
 .httr-oauth
+<<<<<<< HEAD
+=======
+data/
+>>>>>>> 4a638944df23d56563f566c28c736c88a9b3581f

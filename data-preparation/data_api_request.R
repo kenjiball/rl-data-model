@@ -1,14 +1,12 @@
 # Get data using the Stats API and Key
 
 # Call packages
-library(curl)
-library(jsonlite)
-
+source("./load-packages.R")
 
 ##### Import local variables from file #####
-wd <- "/Users/ballk/OneDrive - Tabcorp/Documents/rl-data-model/data"
+wd_data <- paste0(wd, "/data")
 
-setwd(wd)
+setwd(wd_data)
 getwd()
 
 
@@ -37,7 +35,7 @@ grabData(20180101,api_url,api_scoring_key,"scoringdata_")
 
 # Vector of games
                  
-sapply(season_2018, grabData,api_url,api_player_key,"playerdata_")
-sapply(season_2018, grabData,api_url,api_match_key,"matchdata_")
-sapply(season_2018, grabData,api_url,api_scoring_key,"scoringdata_")
+sapply(season_2019, grabData,api_url,api_player_key,"playerdata_")
+sapply(season_2019, grabData,api_url,api_match_key,"matchdata_")
+sapply(season_2019, grabData,api_url,api_scoring_key,"scoringdata_")
 

@@ -4,13 +4,11 @@
 source("./load-packages.R")
 
 ##### Import local variables from file #####
-wd <- "/Users/ballk/OneDrive - Tabcorp/Documents/rl-data-model/official-data"
-
 setwd(wd)
 getwd()
 
 # Load functions
-source("./functions-nrl-data.R")
+source("./official-data/functions-nrl-data.R")
 
 
 # get reference dfs.
@@ -37,7 +35,7 @@ draw_2018_round <- lapply(1:29 , function(i)get_nrl_draw(111,2018,i, "round", dr
 draw_2019_round <- lapply(1:25  , function(i)get_nrl_draw(111,2019,i, "round", draw_url))
 
 # set rounds
-rounds <- 1:5
+rounds <- 1:10
 
 # get Match URLs to get match data
 match_url_lookup_2013 <- lapply( 1:30, function(i) unlist(draw_2013_round[[i]]$matchCentreUrl))
@@ -86,6 +84,10 @@ match_table_2018_df <- list_df2df(lapply(1:201, function(i)extract_nrl_match_dat
 
 match_table_2019_df <- list_df2df(lapply(matches, function(i)extract_nrl_match_data(match_data_2019,i)))
 
+# TO DO: Fix issue of factor to numeric conversion in the function
+match_table_2019_df$matchId <- as.numeric(as.character(match_table_2019_df$matchId))
+match_table_2019_df$startTime <- as.POSIXct(match_table_2019_df$startTime)
+
 match_table_df <- bind_rows(match_table_2013_df, match_table_2014_df, match_table_2015_df, match_table_2016_df,
                             match_table_2017_df, match_table_2018_df, match_table_2019_df)
 
@@ -99,6 +101,9 @@ player_2018_df <- bind_rows(lapply(1:201, function(i)extract_nrl_player_data(mat
 
 player_2019_df <- bind_rows(lapply(matches, function(i)extract_nrl_player_data(match_data_2019,i)))
 
+# TO DO: Fix issue of factor to numeric conversion in the function
+player_2019_df$matchId <- as.numeric(player_2019_df$matchId)
+
 player_df <- bind_rows(player_2013_df, player_2014_df, player_2015_df, player_2016_df,
                             player_2017_df, player_2018_df, player_2019_df)
 
@@ -107,14 +112,14 @@ player_df <- bind_rows(player_2013_df, player_2014_df, player_2015_df, player_20
 
 
 # Load data to Googledrive
-
 # use googledrive package to upload file to drive
 upload_to_drive(transitionDataset, gdrive_path_id)
-
-
-
 # Download data from Google drive
+transitionDataset <- download_from_drive("transitionDataset")
 
+#ggimage, googledrive, rsvg
+
+drive_files <- drive_find(n_max = 100)
 
 
 # More data not currently extracted
@@ -187,21 +192,21 @@ match_table_df %>%
   
 
 # Errors per try plot
-match_table_df_2 %>% 
+match_features_df %>% 
   inner_join(player_df, by = "matchId") %>% 
   mutate(team_url = if_else(homeAway == "Home", home_team_logo_url,away_team_logo_url) ) %>% 
-  select(year, matchId, name, homeAway, team_url, errors, tries) %>%
-  group_by(year, name, team_url) %>% 
-  filter(year >= 2016) %>% 
+  select(season, matchId, name, homeAway, team_url, errors, tries, missedTackles, ) %>%
+  group_by(season, name, team_url) %>% 
+  filter(season >= 2016) %>% 
   summarise( count = n(),
              games = n_distinct(matchId),
-             errors = sum(errors, na.rm = TRUE),
+             errors = sum(missedTackles, na.rm = TRUE),
              tries  = sum(tries, na.rm = TRUE),
-             errors_per_game = errors/games,
+             missed_tackles_per_game = errors/games,
              errors_per_tries = errors/tries
              ) %>% 
   ungroup() %>% 
-  ggplot(aes(x = year, y= errors_per_tries)) +
+  ggplot(aes(x = season, y= missed_tackles_per_game)) +
   geom_image(aes(image=team_url), size=.035)
 
 
@@ -244,19 +249,6 @@ player_df %>%
 
 
 
-
-
-#### Create some basic features
-match_table_df_2 <- match_table_df %>% 
-  mutate(
-    year       = substr(matchId,1,4),
-    homeResult = case_when( homeScore > awayScore ~ 'Win',
-                            homeScore < awayScore ~ 'Lose',
-                            homeScore == awayScore ~ 'Draw',
-                            TRUE ~ 'NA'),
-    home_team_logo_url = paste0(image_url, homeKey, "-badge.svg"),
-    away_team_logo_url = paste0(image_url, awayKey, "-badge.svg")
-  )
 
 
 

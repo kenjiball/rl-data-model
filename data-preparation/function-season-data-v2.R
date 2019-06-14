@@ -44,8 +44,11 @@ create.statsmatrix <-function(match_vector){
   
   # Add team name to data frame
   teamA_stats_df <- teamA_stats_df %>% 
-                    mutate( name = as.character(jsonMatchData$team_A$name) ) %>%
-                    select(name, everything())
+                    mutate( team_id = jsonMatchData$team_A$id,
+                            team_code = jsonMatchData$team_A$code,
+                            name = as.character(jsonMatchData$team_A$name),
+                            short_name = as.character(jsonMatchData$team_A$short_name) ) %>%
+                    select(team_id, team_code, name, short_name, everything())
   
   # Append column names with teamA_
   colnames(teamA_stats_df) <- paste("teamA", colnames(teamA_stats_df), sep = "_")
@@ -62,8 +65,11 @@ create.statsmatrix <-function(match_vector){
   
   # Add team name to data frame
   teamB_stats_df <- teamB_stats_df %>% 
-    mutate( name = as.character(jsonMatchData$team_B$name) ) %>%
-    select(name, everything())
+                      mutate( team_id = jsonMatchData$team_B$id,
+                              team_code = jsonMatchData$team_B$code,
+                              name = as.character(jsonMatchData$team_B$name),
+                              short_name = as.character(jsonMatchData$team_B$short_name) ) %>%
+                      select(team_id, team_code, name, short_name, everything())
   
   # Append column names with teamA_
   colnames(teamB_stats_df) <- paste("teamB", colnames(teamB_stats_df), sep = "_")

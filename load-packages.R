@@ -25,5 +25,6 @@ pacman::p_load(
   , tibble
   , tictoc
   , tidyr
+  , XLConnect
   , zoo)
 

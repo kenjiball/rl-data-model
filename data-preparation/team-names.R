@@ -1,4 +1,32 @@
-# Script for mapping team id to name and code
+# Mapping functions
+# Map player and team data using 2018 data
+
+# Get fox team names
+# Case statement to map Tigers team name for the join
+fox_team_names <- season_2018_datamatrix %>% 
+  select(for_team_id, for_team_code, for_name, for_short_name) %>% 
+  mutate( map_name = case_when( for_short_name == "Tigers" ~ "Wests Tigers",
+                                TRUE ~ for_short_name
+  ) ) %>% 
+  unique() %>% 
+  rename( "fox_teamId" = for_team_id, "fox_team_code" = for_team_code, "fox_team_name" = for_name, "fox_team_short_name" = for_short_name)
+
+# Get NRL team names
+nrl_team_names <- match_table_2018_df %>% 
+  select(homeId, homeNickName, homeTeam) %>% 
+  unique() %>% 
+  rename( "nrl_teamId" = homeId, "nrl_team_name" = homeTeam, "nrl_team_short_name" = homeNickName)
+
+# Join data frames to create mapping table
+team_names_df <- left_join(nrl_team_names, fox_team_names, by = c("nrl_team_short_name" = "map_name"))
+
+
+
+
+
+# OLD Script for mapping team id to name and code
+# Can be deleted once everything is mapped as per above code
+
 
 team_name_df <-
 data.frame(rbind(

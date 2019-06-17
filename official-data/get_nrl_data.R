@@ -3,6 +3,9 @@
 # Call packages
 source("./load-packages.R")
 
+# Read masking file
+source("./masking_file.R")
+
 ##### Import local variables from file #####
 setwd(wd)
 getwd()
@@ -35,7 +38,7 @@ draw_2018_round <- lapply(1:29 , function(i)get_nrl_draw(111,2018,i, "round", dr
 draw_2019_round <- lapply(1:25  , function(i)get_nrl_draw(111,2019,i, "round", draw_url))
 
 # set rounds
-rounds <- 1:10
+rounds <- 1:12
 
 # get Match URLs to get match data
 match_url_lookup_2013 <- lapply( 1:30, function(i) unlist(draw_2013_round[[i]]$matchCentreUrl))
@@ -113,7 +116,7 @@ player_df <- bind_rows(player_2013_df, player_2014_df, player_2015_df, player_20
 
 # Load data to Googledrive
 # use googledrive package to upload file to drive
-upload_to_drive(transitionDataset, gdrive_path_id)
+upload_to_drive(match_table_df, gdrive_path_id)
 # Download data from Google drive
 transitionDataset <- download_from_drive("transitionDataset")
 
@@ -200,13 +203,13 @@ match_features_df %>%
   filter(season >= 2016) %>% 
   summarise( count = n(),
              games = n_distinct(matchId),
-             errors = sum(missedTackles, na.rm = TRUE),
+             errors = sum(errors, na.rm = TRUE),
              tries  = sum(tries, na.rm = TRUE),
              missed_tackles_per_game = errors/games,
              errors_per_tries = errors/tries
              ) %>% 
   ungroup() %>% 
-  ggplot(aes(x = season, y= missed_tackles_per_game)) +
+  ggplot(aes(x = season, y= errors_per_tries)) +
   geom_image(aes(image=team_url), size=.035)
 
 

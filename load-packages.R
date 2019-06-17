@@ -20,6 +20,7 @@ pacman::p_load(
   , RCurl
   , ROCR
   , rsvg
+  , rvest
   , stringr
   , tibble
   , tictoc

@@ -1,15 +1,20 @@
-# TEst scrape player data using rvest
+# Get player career summary using by scraping player data using rvest
 # Example: https://www.analyticsvidhya.com/blog/2017/03/beginners-guide-on-web-scraping-in-r-using-rvest-with-hands-on-knowledge/
 
 
 ### Examples
-#get_player_career_summary("brent", "naden", "panthers", web_url)
-#get_player_career_summary("cameron", "smith", "storm", web_url)
-
-get_player_career_summary <- function(player_first_name, player_last_name, player_team, web_url){
+#get_player_career_summary("blake", "ferguson", "eels", web_url)
+#get_player_career_summary("jesse", "bromwich", "storm", web_url)
+#get_player_career_summary("Tom", "Opacic", "cowboys", web_url, player_url = "https://www.cowboys.com.au/teams/telstra-premiership/north-queensland-cowboys/tom-opacic/")
+	
+get_player_career_summary <- function(player_first_name, player_last_name, player_team, web_url, player_url = NULL){
 
 # Make URL
-url <- paste0(web_url,"/players/nrl-premiership/",player_team,"/",player_first_name,"-",player_last_name,"/")
+if(is.null(player_url)){
+  url <- paste0(web_url,"/players/nrl-premiership/",player_team,"/",player_first_name,"-",player_last_name,"/")
+}else{
+  url <- player_url
+}
 
 #Reading the HTML code from the website
 webpage <- read_html(url)
@@ -26,7 +31,10 @@ rank_data <- html_text(rank_data_html)
 rank_data<-gsub("\n","",rank_data)
 rank_data<-gsub("\r","",rank_data)
 rank_data<-gsub(" ","",rank_data)
-
+rank_data<-gsub("\u00A0"," ",rank_data)
+rank_data<-gsub("-","0",rank_data)
+rank_data<-gsub("%","",rank_data)
+rank_data<-gsub(",","",rank_data)
 
 # Convert to data frame
 rank_data_df <- data.frame(rank_data)
@@ -40,18 +48,8 @@ rank_data_df <- rank_data_df %>% filter(rank_data != "" )
 
 
 # Find how many seasons and frame width of data in table
-frame_width <- case_when(
-  length(rank_data_df$rank_data)/21 == round(length(rank_data_df$rank_data)/21) ~ 21,
-  length(rank_data_df$rank_data)/22 == round(length(rank_data_df$rank_data)/22) ~ 22,
-  length(rank_data_df$rank_data)/23 == round(length(rank_data_df$rank_data)/23) ~ 23,
-  length(rank_data_df$rank_data)/24 == round(length(rank_data_df$rank_data)/24) ~ 24,
-  length(rank_data_df$rank_data)/25 == round(length(rank_data_df$rank_data)/25) ~ 25,
-  TRUE ~ 23
-)
+frame_width <- which(rank_data_df$rank_data == "Average Points")
 seasons <- length(rank_data_df$rank_data)/frame_width
-
-
-
 
 
 # Loop through seasons and build the data frame

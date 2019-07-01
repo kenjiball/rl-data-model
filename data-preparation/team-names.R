@@ -13,13 +13,20 @@ fox_team_names <- season_2018_datamatrix %>%
 
 # Get NRL team names
 nrl_team_names <- match_table_2018_df %>% 
-  select(homeId, homeNickName, homeTeam) %>% 
+  select(homeId, homeNickName, homeTeam, homeKey) %>% 
   unique() %>% 
   rename( "nrl_teamId" = homeId, "nrl_team_name" = homeTeam, "nrl_team_short_name" = homeNickName)
 
 # Join data frames to create mapping table
 team_names_df <- left_join(nrl_team_names, fox_team_names, by = c("nrl_team_short_name" = "map_name"))
 
+# Include logo URL
+team_names_df <- team_names_df %>% 
+  mutate(team_logo_url = paste0(image_url, homeKey, "-badge.svg"))
+
+# No spaces team name
+team_names_df <- team_names_df %>% 
+  mutate(nrl_team_short_name_ns = gsub(" ","",nrl_team_short_name))
 
 
 

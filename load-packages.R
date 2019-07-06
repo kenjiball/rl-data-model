@@ -7,6 +7,7 @@ pacman::p_load(
   , curl
   , DT
   , dplyr
+  , fuzzyjoin
   , ggimage
   , ggplot2
   , ggpubr
@@ -25,6 +26,6 @@ pacman::p_load(
   , tibble
   , tictoc
   , tidyr
-  , XLConnect
+  #, XLConnect
   , zoo)
 

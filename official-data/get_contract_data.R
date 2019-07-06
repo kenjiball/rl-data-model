@@ -28,7 +28,7 @@ contract_data_df$contract_data <- as.character(contract_data_df$contract_data)
 # Remove blank rows
 contract_data_df <- contract_data_df %>% filter(!contract_data %in% c(""," ") )
 
-# Add in a team id to help plit the data
+# Add in a team id to help split the data
 contract_data_df2 <- contract_data_df %>% 
   mutate( team_start = if_else(contract_data == "Player", 1, 0),
           team_order = cumsum(team_start),
@@ -102,13 +102,21 @@ contract_data_df2 <- contract_data_df %>%
   left_join(team_names_df, by = "fox_teamId") %>% 
   select(fox_teamId, nrl_team_short_name, player_order, player_name, "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027")
 
+# Clean up the data
+# Remove duplicates
+contract_data_df2 <- contract_data_df2 %>% 
+  filter(!player_order %in% c(144, 148))
 
 
+# Add in player id to map to player stats
 
+contract_data_df3 <- player_names_df %>% 
+  mutate( fullName = paste0(firstName, lastName)) %>% 
+  stringdist_right_join( contract_data_df2, by = c("fullName" = "player_name" ), max_dist = 2 ) %>% 
+  ungroup()
 
-
-
-
+# Write to csv
+write_csv(contract_data_df3, "./data/player_contracts_20190701.csv")
 
 
 

@@ -27,6 +27,17 @@ test1 <- myMergedData %>%
   select(firstName, lastName, Team, Year, Played, Non_Kick_Return_Metres, Run_Metres_pg) %>% 
   top_n(10, Non_Kick_Return_Metres)
 
+# Total Metres per game
+test2 <- myMergedData %>% 
+  select(firstName, lastName, Team, Year, Played, TotalRunning.Metres, KickReturn.Metres, AverageRunning.Metres ) %>% 
+  mutate( Non_Kick_Return_Metres = (TotalRunning.Metres - KickReturn.Metres )/Played) %>% 
+  filter(Played >= 10) %>% 
+  arrange(desc(Non_Kick_Return_Metres)) %>%
+  select( -TotalRunning.Metres, -KickReturn.Metres) %>%
+  rename("Run_Metres_pg" = AverageRunning.Metres) %>% 
+  select(firstName, lastName, Team, Year, Played, Non_Kick_Return_Metres, Run_Metres_pg) %>% 
+  top_n(10, Non_Kick_Return_Metres)
+
 # Forced Dropouts per game
 test1 <- myMergedData %>% 
   select(firstName, lastName, Team, Year, Played, ForcedDrop.Outs ) %>% 

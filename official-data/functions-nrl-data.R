@@ -72,17 +72,61 @@ get_nrl_draw <- function(competition_id, season_id, lookup_id, type = c("round",
 ##### Get NRL match data
 # Function: get_nrl_match_data
 
-get_nrl_match_data <- function(match_url, web_url_in){
+get_nrl_match_data <- function(match_url, web_url_in, write_file = FALSE, file_dir = "" ){
   
   # Set up the url_string to get draw information by comp, season, team
   draw_url_string <- paste0(web_url_in, match_url, "data")
   # Get Json team file and convert to List
   nrl_match_json <- fromJSON(draw_url_string)
   
-  return(nrl_match_json)
+  if(write_file == TRUE){
+    # 2: Make pretty Json
+    to_file <- toJSON(nrl_match_json, pretty = TRUE)
+    # 3: write to file in data sub directory
+    write(to_file, paste0(file_dir, nrl_match_json$matchId,".json") )
+  } else{
+    return(nrl_match_json) 
+  }
   
 }
 
+##### Write and load NRL match data
+# Function: write_load_nrl_match_data
+#Example: match_data_2018 <- write_load_nrl_match_data(2018, 25:30, wd_data, load_full_year = TRUE, update_files = TRUE)
+#
+# year:           The year of the season. Used to save and load files from the correct directory
+# matches:        A numerical vector of the match numbers e.g. 1:8 will load the first 8 games of the season
+# wd_data_f:      The working directory for the data files
+# load_full_year: A logical to load the full year of data or just the games defined by matches
+# update_files:   A logical that when TRUE to load and save fiels from the match_urls to the wd_data_f. 
+#                 This is left false unless we need to update or write new files to the data directory.
+#
+
+write_load_nrl_match_data <- function(year, match_str, wd_data_f, load_full_year = TRUE, update_files = FALSE){
+  
+  # STEP 1: Load match urls from file
+  match_urls <- read_csv(paste0(wd_data_f, "/nrl_url/", "match_url_",year,".csv"), col_names = "url")
+  
+  # STEP 2: Using match urls, data is saved to file
+  # Apply across the match urls to get the data and write to file
+  if(update_files == TRUE){
+    sapply(match_urls$url[match_str],
+         function(i)get_nrl_match_data(i, web_url, write_file = TRUE, file_dir = paste0(wd_data_f,"/nrl_match_data/",year,"/") ))
+  }
+  
+  # STEP 3: Data is loaded from file
+  # Load data from file into a single list
+  files_list <- list.files(paste0(wd_data_f,"/nrl_match_data/",year), pattern="*.json", full.names=TRUE)
+  
+  if(load_full_year == FALSE){
+    files_list <- files_list[match_str]
+  }
+  
+  match_data_new <- lapply(files_list, function(i)fromJSON(i))
+  
+  return(match_data_new)
+  
+}
 
 ### Extract match data
 # Function: extract_nrl_match_data
@@ -124,10 +168,27 @@ extract_nrl_match_data <- function(input_list,match_num){
                              replace_null(input_list[[match_num]]$awayTeam$scoring$halfTimeScore, 0),
                              replace_null(input_list[[match_num]]$homeTeam$captainPlayerId, 0),
                              replace_null(input_list[[match_num]]$awayTeam$captainPlayerId, 0))
-  
+  # Set Names
   names(match_data) <- c("matchId","competitionId","roundNumber","roundTitle","homeId","homeTeam","homeNickName","homeKey","awayId","awayTeam",
                          "awayNickName","awayKey","venue","startTime","hashTag","weather","groundConditions","attendance","homeScore","awayScore",
                          "homeHTScore","awayHTScore","homeCaptainId","awayCaptainId")
+  
+  # Set Data Types
+  num_char_cols <- c("matchId")
+  numeric_cols <- c("competitionId", "roundNumber", "homeId", "awayId", "attendance","homeScore","awayScore",
+                    "homeHTScore","awayHTScore","homeCaptainId","awayCaptainId")
+  character_cols <- c("roundTitle", "homeTeam", "homeNickName", "homeKey", "awayTeam", "awayNickName", "awayKey", "venue",
+                      "hashTag", "weather", "groundConditions")
+  date_cols <- c("startTime")
+
+  # Mutate at cols to set correct data type
+  match_data <- match_data %>% mutate_at(num_char_cols, funs(as.numeric(as.character(.))))
+  match_data <- match_data %>% mutate_at(numeric_cols, funs(as.numeric(.)))
+  match_data <- match_data %>% mutate_at(character_cols, funs(as.character(.)))
+  match_data <- match_data %>% mutate_at(date_cols, funs(as.POSIXct(., format = "%Y-%m-%dT%H:%M:%OSZ")))
+  
+  # Add some basic features
+  match_data <- match_data %>% mutate(season = substr(matchId,1,4) )
   
   return(match_data)
   
@@ -169,6 +230,31 @@ extract_nrl_player_data <- function(input_list,match_num){
                                        position %in% c("Interchange") ~ "Interchange",
                                        TRUE ~ "NA" )
           )
+  
+  # Set Data Types
+  numeric_cols <- c("playerId","number","matchId","teamId","allRunMetres","allRuns","bombKicks","crossFieldKicks","conversions",
+                    "conversionAttempts", "dummyHalfRuns", "dummyHalfRunMetres", "dummyPasses", "errors", "fantasyPointsTotal" , 
+                      "fieldGoals", "forcedDropOutKicks", "fortyTwentyKicks", "goals", "goalConversionRate" ,
+                      "grubberKicks", "handlingErrors", "hitUps", "hitUpRunMetres", "ineffectiveTackles" ,
+                      "intercepts", "kicks", "kicksDead", "kicksDefused", "kickMetres" ,
+                      "kickReturnMetres", "lineBreakAssists", "lineBreaks", "lineEngagedRuns", "minutesPlayed" ,
+                      "missedTackles", "offloads", "oneOnOneLost", "oneOnOneSteal", "onReport" ,
+                      "passesToRunRatio", "passes", "playTheBallTotal", "playTheBallAverageSpeed", "penalties" ,
+                      "points", "penaltyGoals", "postContactMetres", "receipts", "sendOffs" ,
+                      "sinBins", "stintOne", "tackleBreaks", "tackleEfficiency", "tacklesMade" ,
+                      "tries", "tryAssists") #, "stintTwo"
+  
+  character_cols <- c("firstName","lastName","position","headImage","bodyImage","url","homeAway","name","nickName","positionGroups")
+  logical_cols <- c("isOnField")
+
+  # Mutate at cols to set correct data type
+  player_df <- player_df %>% mutate_at(numeric_cols, funs(as.numeric(.)))
+  player_df <- player_df %>% mutate_at(character_cols, funs(as.character(.)))
+  player_df <- player_df %>% mutate_at(logical_cols, funs(as.logical(.)))
+  
+  # Add some basic features
+  player_df <- player_df %>% mutate(season = substr(matchId,1,4), 
+                                    roundNumber = as.numeric(substr(matchId,8,9)) )
   
   return(player_df)
   
